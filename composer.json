@@ -1,0 +1,31 @@
+{
+    "name": "electivegroup/api-clients-php",
+    "type": "symfony-bundle",
+    "description": "Elective API Clients SDK",
+    "keywords": ["elective", "symfony", "security", "api"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kris Rybak",
+            "email": "kris@elective.io"
+        }
+    ],
+    "require": {
+        "php": "^7.1.13"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3",
+        "phpunit/phpunit": "^8.5"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": { "Elective\\ApiClients\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Elective\\ApiClients\\Tests\\": "tests/" }
+    },
+    "minimum-stability": "stable"
+}

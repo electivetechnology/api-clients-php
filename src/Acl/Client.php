@@ -1,0 +1,68 @@
+<?php
+
+namespace Elective\ApiClients\Acl;
+
+use Elective\ApiClients\Result;
+use Elective\ApiClients\ApiClient;
+use Elective\ApiClients\Acl\Authorisation\Check;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+/**
+ * Elective\ApiClients\Acl\Client
+ *
+ * @author Kris Rybak <kris.rybak@electivegroup.com>
+ */
+class Client extends ApiClient
+{
+    public const ACL_API_URL    = 'https://acl-api.connect.staging.et-ns.net';
+    public const PATH_AUTHORISE = '/v1/authorise';
+    public const PATH_GET_ORGANISATION = '/v1/organisations';
+
+    public function __construct(
+        HttpClientInterface $client,
+        string $aclApiBaseUrl = self::ACL_API_URL,
+        bool $isEnabled = true
+    ) {
+        $this->setClient($client);
+        $this->setIsEnabled($isEnabled);
+        $this->setBaseUrl($aclApiBaseUrl);
+    }
+
+    public function isTokenAuthorised($token, Check $check, array $checks = []): Result
+    {
+        // Prepare client options
+        $options = [];
+
+        // Set data
+        $options['json'] = $check;
+
+        // Set Token for this request
+        $options['auth_bearer'] = $token;
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_AUTHORISE;
+
+        // Send request
+        return $this->handleRequest('POST', $requestUrl, $options);
+    }
+
+    public function isAuthorised(Check $check, array $checks = [])
+    {
+        return $this->isTokenAuthorised($this->getToken(), $check, $checks);
+    }
+
+    public function getOrganisation($token, $organisation)
+    {
+        // Prepare client options
+        $options = [];
+
+        // Set Token for this request
+        $options['auth_bearer'] = $token;
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION;
+
+        // Send request
+        return $this->handleRequest('GET', $requestUrl, $options);
+    }
+}

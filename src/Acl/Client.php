@@ -14,8 +14,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class Client extends ApiClient
 {
-    public const ACL_API_URL    = 'https://acl-api.connect.staging.et-ns.net';
-    public const PATH_AUTHORISE = '/v1/authorise';
+    public const ACTION_VIEW        = 'view';
+    public const ACTION_CREATE      = 'create';
+    public const ACTION_EDIT        = 'edit';
+    public const ACTION_DELETE      = 'delete';
+    public const ACTION_UNDELETE    = 'undelete';
+    public const ACTION_OPERATOR    = 'operator';
+    public const ACTION_MASTER      = 'master';
+    public const ACTION_OWNER       = 'owner';
+
+    public const ACL_API_URL        = 'https://acl-api.connect.staging.et-ns.net';
+    public const PATH_AUTHORISE     = '/v1/authorise';
     public const PATH_GET_ORGANISATION = '/v1/organisations';
 
     public function __construct(

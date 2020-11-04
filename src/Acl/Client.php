@@ -6,6 +6,7 @@ use Elective\ApiClients\Result;
 use Elective\ApiClients\ApiClient;
 use Elective\ApiClients\Acl\Authorisation\Check;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Elective\ApiClients\Acl\Client
@@ -30,11 +31,22 @@ class Client extends ApiClient
     public function __construct(
         HttpClientInterface $client,
         string $aclApiBaseUrl = self::ACL_API_URL,
-        bool $isEnabled = true
+        bool $isEnabled = true,
+        RequestStack $request
     ) {
         $this->setClient($client);
         $this->setIsEnabled($isEnabled);
         $this->setBaseUrl($aclApiBaseUrl);
+        $token = $request->getCurrentRequest()->headers->get('authorization');
+
+        if ($token) {
+            $pos = strpos($token, 'Bearer ');
+            if (!is_null($pos)) {
+                $str = substr($token, 7);
+
+                $this->setToken($str);
+            }
+        }
     }
 
     public function isTokenAuthorised($token, Check $check, array $checks = []): Result
@@ -60,7 +72,7 @@ class Client extends ApiClient
         return $this->isTokenAuthorised($this->getToken(), $check, $checks);
     }
 
-    public function getOrganisation($token, $organisation)
+    public function getOrganisationWithToken($organisation, $token)
     {
         // Prepare client options
         $options = [];
@@ -73,5 +85,10 @@ class Client extends ApiClient
 
         // Send request
         return $this->handleRequest('GET', $requestUrl, $options);
+    }
+
+    public function getOrganisation($organisation)
+    {
+        return $this->getOrganisationWithToken($this->getToken(), $organisation);
     }
 }

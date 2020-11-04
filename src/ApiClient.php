@@ -93,6 +93,9 @@ class ApiClient
         $result = new Result();
 
         if (!$this->getIsEnabled()) {
+            // Fake response
+            $result->setCode(200);
+
             return $result;
         }
 

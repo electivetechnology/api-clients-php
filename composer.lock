@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c1da62f43bc0f86c7f367995d6302cd4",
+    "content-hash": "9872dce1cc28ea62d0fc9cc8a0bd818c",
     "packages": [
         {
             "name": "composer/package-versions-deprecated",
@@ -1002,16 +1002,16 @@
         },
         {
             "name": "electivegroup/formatter-bundle",
-            "version": "2.2.0",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/electivetechnology/formatter-bundle.git",
-                "reference": "c8a69abaf6e33c9026950fe7036eb28f7c0454b9"
+                "reference": "e58fb0e6dfbc0aa44f0c93e1889d73617eeee364"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/electivetechnology/formatter-bundle/zipball/c8a69abaf6e33c9026950fe7036eb28f7c0454b9",
-                "reference": "c8a69abaf6e33c9026950fe7036eb28f7c0454b9",
+                "url": "https://api.github.com/repos/electivetechnology/formatter-bundle/zipball/e58fb0e6dfbc0aa44f0c93e1889d73617eeee364",
+                "reference": "e58fb0e6dfbc0aa44f0c93e1889d73617eeee364",
                 "shasum": ""
             },
             "require": {
@@ -1027,7 +1027,6 @@
                 "symfony/security-bundle": "^5.1"
             },
             "require-dev": {
-                "squizlabs/php_codesniffer": "^3.5",
                 "symfony/phpunit-bridge": "^5.1"
             },
             "type": "symfony-bundle",
@@ -1057,7 +1056,7 @@
                 "formatter",
                 "symfony"
             ],
-            "time": "2020-10-22T14:46:52+00:00"
+            "time": "2020-10-22T14:46:14+00:00"
         },
         {
             "name": "psr/cache",

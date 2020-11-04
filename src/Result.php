@@ -19,6 +19,11 @@ class Result
      */
     private $data;
 
+    /**
+     * Client error message
+     */
+    private $errorMessage;
+
     public function getCode(): ?int
     {
         return $this->code;
@@ -41,6 +46,27 @@ class Result
         $this->data = $data;
 
         return $this;
+    }
+
+    public function getErrorMessage(): ?string
+    {
+        return $this->errorMessage;
+    }
+
+    public function setErrorMessage($errorMessage): self
+    {
+        $this->errorMessage = $errorMessage;
+
+        return $this;
+    }
+
+    /**
+     * @depricated
+     * This method will be removed
+     */
+    public function getMessage(): ?string
+    {
+        return $this->getErrorMessage();
     }
 
     /**

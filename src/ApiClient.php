@@ -6,6 +6,7 @@ namespace Elective\ApiClients;
 
 use Elective\ApiClients\Result;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Elective\ApiClients\ApiClient
@@ -112,6 +113,48 @@ class ApiClient
             $result->setData($response->getContent(false));
         }
 
+        // Set message
+        if (!$result->isSuccessful()) {
+            $result->setErrorMessage($this->messageFromStatusCode($result->getCode()));
+
+            if (isset($result->getData()->message)) {
+                $result->setErrorMessage($result->getErrorMessage() . '. '. $result->getData()->message);
+            }
+        }
+
         return $result;
+    }
+
+    public function messageFromStatusCode($statusCode)
+    {
+        switch ($statusCode) {
+            case Response::HTTP_OK:
+                return 'OK';
+                break;
+
+            case Response::HTTP_BAD_REQUEST:
+                return 'Bad request';
+                break;
+
+            case Response::HTTP_UNAUTHORIZED:
+                return 'Unauthorised operation';
+                break;
+
+            case Response::HTTP_FORBIDDEN:
+                return 'Action was Forbidden';
+                break;
+
+            case Response::HTTP_NOT_FOUND:
+                return 'Resource was Not found';
+                break;
+
+            case Response::HTTP_INTERNAL_SERVER_ERROR:
+                return 'Problem with ACL Api';
+                break;
+
+            default:
+                return 'Unspecified';
+                break;
+        }
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Elective\ApiClients;
 
 use Elective\ApiClients\Result;
-use Elective\FormatterBundle\Parsers\Json;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -103,9 +102,9 @@ class ApiClient
         $result->setCode($response->getStatusCode());
 
         // Set Data
-        // Try auto parsing to Json
-        if($response->getInfo('content_type') == Json::DEFAULT_MIME_TYPE) {
-            $result->setData(Json::decode($response->getContent(false)));
+        // Try auto parsing JSON
+        if($response->getInfo('content_type') == 'application/json') {
+            $result->setData(json_decode($response->getContent(false)));
         } else {
             $result->setData($response->getContent(false));
         }

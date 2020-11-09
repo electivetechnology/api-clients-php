@@ -26,7 +26,8 @@ class Client extends ApiClient
 
     public const ACL_API_URL        = 'https://acl-api.connect.staging.et-ns.net';
     public const PATH_AUTHORISE     = '/v1/authorise';
-    public const PATH_GET_ORGANISATION = '/v1/organisations';
+    public const PATH_GET_ORGANISATION  = '/v1/organisations';
+    public const PATH_TOKEN_EXCHANGE    = '/v1/token/exchange';
 
     public function __construct(
         HttpClientInterface $client,
@@ -89,6 +90,38 @@ class Client extends ApiClient
 
     public function getOrganisation($organisation)
     {
-        return $this->getOrganisationWithToken($this->getToken(), $organisation);
+        return $this->getOrganisationWithToken($organisation, $this->getToken());
+    }
+
+    /**
+     * Exchanges token for a new one of chosen Organisation
+     *
+     * @return Result
+     */
+    public function exchangeToken($token, $organisation, $extended = null): ?Result
+    {
+        $payload = new StdClass();
+        $payload->organisation = $organisation;
+        $payload->extended = $extended;
+
+        // Prepare client options
+        $options = [];
+
+        // Set Token for this request
+        $options['auth_bearer'] = $token;
+
+        // Set data
+        $options['json'] = $payload;
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_TOKEN_EXCHANGE;
+
+        // Send request
+        return $this->handleRequest('POST', $requestUrl, $options);
+    }
+
+    public function exchangeCurrentToken($organisation, $extended = null)
+    {
+        return $this->exchangeToken($this->getToken(), $organisation, $extended);
     }
 }

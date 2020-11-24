@@ -82,7 +82,7 @@ class Client extends ApiClient
         $options['auth_bearer'] = $token;
 
         // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION;
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation;
 
         // Send request
         return $this->handleRequest('GET', $requestUrl, $options);

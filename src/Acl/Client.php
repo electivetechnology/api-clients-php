@@ -98,7 +98,7 @@ class Client extends ApiClient
      *
      * @return Result
      */
-    public function exchangeToken($token, $organisation, $extended = null): ?Result
+    public function exchangeToken($token, $organisation, $extended = false): ?Result
     {
         $payload = new \StdClass();
         $payload->organisation = $organisation;

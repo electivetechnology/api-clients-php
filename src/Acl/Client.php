@@ -73,8 +73,9 @@ class Client extends ApiClient
         return $this->isTokenAuthorised($this->getToken(), $check, $checks);
     }
 
-    public function getOrganisationWithToken($organisation, $token)
+    public function getOrganisationWithToken($organisation, $token, $detailed)
     {
+        $detailed = isset($detailed) ? '?detailed=' . $detailed : '';
         // Prepare client options
         $options = [];
 
@@ -82,15 +83,15 @@ class Client extends ApiClient
         $options['auth_bearer'] = $token;
 
         // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation;
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation . $detailed;
 
         // Send request
         return $this->handleRequest('GET', $requestUrl, $options);
     }
 
-    public function getOrganisation($organisation)
+    public function getOrganisation($organisation, $detailed)
     {
-        return $this->getOrganisationWithToken($organisation, $this->getToken());
+        return $this->getOrganisationWithToken($organisation, $this->getToken(), $detailed);
     }
 
     /**

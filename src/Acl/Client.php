@@ -73,7 +73,7 @@ class Client extends ApiClient
         return $this->isTokenAuthorised($this->getToken(), $check, $checks);
     }
 
-    public function getOrganisationWithToken($organisation, $token, $detailed)
+    public function getOrganisationWithToken($organisation, $token, $detailed = null)
     {
         $detailed = isset($detailed) ? '?detailed=' . $detailed : '';
         // Prepare client options
@@ -89,7 +89,7 @@ class Client extends ApiClient
         return $this->handleRequest('GET', $requestUrl, $options);
     }
 
-    public function getOrganisation($organisation, $detailed)
+    public function getOrganisation($organisation, $detailed = null)
     {
         return $this->getOrganisationWithToken($organisation, $this->getToken(), $detailed);
     }

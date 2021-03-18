@@ -38,7 +38,7 @@ class Client extends ApiClient
         $this->setClient($client);
         $this->setIsEnabled($isEnabled);
         $this->setBaseUrl($aclApiBaseUrl);
-        $token = $request->getCurrentRequest() && $request->getCurrentRequest()->headers->get('authorization');
+        $token = $request->getCurrentRequest() ? $request->getCurrentRequest()->headers->get('authorization') : '';
 
         if ($token) {
             $pos = strpos($token, 'Bearer ');

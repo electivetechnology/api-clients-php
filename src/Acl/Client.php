@@ -125,4 +125,18 @@ class Client extends ApiClient
     {
         return $this->exchangeToken($this->getToken(), $organisation, $extended);
     }
+    
+    public function createServiceAccount($organisation, $name, $description = '')
+    {
+        // Prepare client options
+        $options = [];
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation . '/service-accounts';
+
+        $options['body'] = json_encode(array("name"  => $name, "description"  => $description));
+
+        // Send request
+        return $this->handleRequest('POST', $requestUrl, $options);
+    }
 }

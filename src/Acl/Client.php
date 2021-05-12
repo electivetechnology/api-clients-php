@@ -139,4 +139,19 @@ class Client extends ApiClient
         // Send request
         return $this->handleRequest('POST', $requestUrl, $options);
     }
+
+    public function grantServiceAccountRole($id, $organisation, $role)
+    {
+        // Prepare client options
+        $options = [];
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION .
+            '/' . $organisation . '/service-accounts/ ' .  $id;
+
+        $options['body'] = json_encode(array("role" => $role));
+
+        // Send request
+        return $this->handleRequest('POST', $requestUrl, $options);
+    }
 }

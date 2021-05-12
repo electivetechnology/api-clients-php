@@ -134,6 +134,8 @@ class Client extends ApiClient
         // Create request URL
         $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation . '/service-accounts';
 
+        $options['auth_bearer'] = $this->getToken();
+
         $options['body'] = json_encode(array("name"  => $name, "description"  => $description));
 
         // Send request
@@ -148,6 +150,8 @@ class Client extends ApiClient
         // Create request URL
         $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION .
             '/' . $organisation . '/service-accounts/ ' .  $id;
+
+        $options['auth_bearer'] = $this->getToken();
 
         $options['body'] = json_encode(array("role" => $role));
 

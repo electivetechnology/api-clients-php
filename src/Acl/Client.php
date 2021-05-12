@@ -149,7 +149,7 @@ class Client extends ApiClient
 
         // Create request URL
         $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION .
-            '/' . $organisation . '/service-accounts/ ' .  $id;
+            '/' . $organisation . '/service-accounts/ ' .  $id . '/grant';
 
         $options['auth_bearer'] = $this->getToken();
 

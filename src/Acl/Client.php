@@ -140,7 +140,7 @@ class Client extends ApiClient
         return $this->handleRequest('POST', $requestUrl, $options);
     }
 
-    public function grantRole($id, $organisation, $role)
+    public function grantServiceAccountRole($id, $organisation, $role)
     {
         // Prepare client options
         $options = [];

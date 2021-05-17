@@ -125,7 +125,21 @@ class Client extends ApiClient
     {
         return $this->exchangeToken($this->getToken(), $organisation, $extended);
     }
-    
+
+    public function getServiceAccount($organisation, $id)
+    {
+        // Prepare client options
+        $options = [];
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION .
+            '/' . $organisation . '/service-accounts/' .  $id;
+
+        $options['auth_bearer'] = $this->getToken();
+
+        return $this->handleRequest('GET', $requestUrl, $options);
+    }
+
     public function createServiceAccount($organisation, $name, $description = '')
     {
         // Prepare client options

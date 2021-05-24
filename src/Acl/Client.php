@@ -140,13 +140,16 @@ class Client extends ApiClient
         return $this->handleRequest('GET', $requestUrl, $options);
     }
 
-    public function createServiceAccount($organisation, $name, $description = '')
+    public function createServiceAccount($organisation, $name, $description = '', $detailed = null, $createToken = null)
     {
+        $query = '?';
+        $query .= isset($detailed) ? '&detailed=' . $detailed : '';
+        $query .= isset($createToken) ? '&create-token=' . $createToken : '';
         // Prepare client options
         $options = [];
 
         // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation . '/service-accounts';
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation . '/service-accounts' . $query;
 
         $options['auth_bearer'] = $this->getToken();
 

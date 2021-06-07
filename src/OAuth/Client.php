@@ -43,13 +43,14 @@ class Client extends ApiClient
      *
      * @return Result
      */
-    public function createAuthorization($clientId, $vendor, $scopes = null, $username = null): ?Result
+    public function createAuthorization($clientId, $vendor, $scopes = null, $username = null, $secret = null): ?Result
     {
         $payload = new \StdClass();
         $payload->clientId = $clientId;
         $payload->vendor = $vendor;
         $payload->scopes = $scopes;
         $payload->username = $username;
+        $payload->clientSecret = $secret;
 
         // Prepare client options
         $options = [];

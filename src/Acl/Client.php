@@ -28,6 +28,7 @@ class Client extends ApiClient
     public const PATH_AUTHORISE     = '/v1/authorise';
     public const PATH_GET_ORGANISATION  = '/v1/organisations';
     public const PATH_TOKEN_EXCHANGE    = '/v1/token/exchange';
+    public const PATH_GET_USERS         = '/v1/users';
 
     public function __construct(
         HttpClientInterface $client,
@@ -174,5 +175,22 @@ class Client extends ApiClient
 
         // Send request
         return $this->handleRequest('POST', $requestUrl, $options);
+    }
+
+    public function getUserDetails($username)
+    {
+        $filter = '?filters[]=and-user.username-inci-value-' . $username;
+        
+        // Prepare client options
+        $options = [];
+        
+        // Set Token for this request
+        $options['auth_bearer'] = $this->getToken();
+        
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_USERS . '/' . $filter;
+
+        // Send request
+        return $this->handleRequest('GET', $requestUrl, $options);
     }
 }

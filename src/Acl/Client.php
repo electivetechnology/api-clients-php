@@ -179,7 +179,7 @@ class Client extends ApiClient
 
     public function getUserDetails($username)
     {
-        $filter = '?filters[]=and-user.username-inci-value-' . $username;
+        $filter = '?filters[]=and-user.username-eq-value-' . $username;
         
         // Prepare client options
         $options = [];
@@ -188,7 +188,7 @@ class Client extends ApiClient
         $options['auth_bearer'] = $this->getToken();
         
         // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_USERS . '/' . $filter;
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_USERS . $filter;
 
         // Send request
         return $this->handleRequest('GET', $requestUrl, $options);

@@ -29,6 +29,7 @@ class Client extends ApiClient
     public const PATH_GET_ORGANISATION  = '/v1/organisations';
     public const PATH_TOKEN_EXCHANGE    = '/v1/token/exchange';
     public const PATH_GET_USERS         = '/v1/users';
+    public const PATH_ROLE              = '/v1/roles';
 
     public function __construct(
         HttpClientInterface $client,
@@ -141,7 +142,7 @@ class Client extends ApiClient
         return $this->handleRequest('GET', $requestUrl, $options);
     }
 
-    public function createServiceAccount($organisation, $name, $description = '', $detailed = null, $createToken = null)
+    public function createServiceAccount($organisation, $name, $description = '', $detailed = null, $createToken = null, $role = null)
     {
         $query = '?';
         $query .= isset($detailed) ? '&detailed=' . $detailed : '';
@@ -154,7 +155,7 @@ class Client extends ApiClient
 
         $options['auth_bearer'] = $this->getToken();
 
-        $options['body'] = json_encode(array("name"  => $name, "description"  => $description));
+        $options['body'] = json_encode(array("name"  => $name, "description"  => $description, "role"  => $role));
 
         // Send request
         return $this->handleRequest('POST', $requestUrl, $options);
@@ -192,5 +193,35 @@ class Client extends ApiClient
 
         // Send request
         return $this->handleRequest('GET', $requestUrl, $options);
+    }
+
+    public function readRole($spec)
+    {
+        // Prepare client options
+        $options = [];
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_ROLE . '/' . $spec;
+
+        $options['auth_bearer'] = $this->getToken();
+
+        // Send request
+        return $this->handleRequest('GET', $requestUrl, $options);
+    }
+
+    public function createRole($name, $description = '', $permissionGroups = [])
+    {
+        // Prepare client options
+        $options = [];
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_ROLE;
+
+        $options['auth_bearer'] = $this->getToken();
+
+        $options['body'] = json_encode(array("name" => $name, "description" => $description, "permissionGroups" => $permissionGroups));
+
+        // Send request
+        return $this->handleRequest('POST', $requestUrl, $options);
     }
 }

@@ -209,7 +209,7 @@ class Client extends ApiClient
         return $this->handleRequest('GET', $requestUrl, $options);
     }
 
-    public function createRole($name, $description = '', $permissionGroups = [])
+    public function createRole($name, $description = '', $permissionGroups = [], $type = false)
     {
         // Prepare client options
         $options = [];
@@ -219,7 +219,13 @@ class Client extends ApiClient
 
         $options['auth_bearer'] = $this->getToken();
 
-        $options['body'] = json_encode(array("name" => $name, "description" => $description, "permissionGroups" => $permissionGroups));
+        $body = array("name" => $name, "description" => $description, "permissionGroups" => $permissionGroups);
+
+        if ($type) {
+            $body['type'] = $type;
+        }
+
+        $options['body'] = json_encode($body);
 
         // Send request
         return $this->handleRequest('POST', $requestUrl, $options);

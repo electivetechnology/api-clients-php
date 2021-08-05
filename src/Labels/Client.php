@@ -27,11 +27,13 @@ class Client extends ApiClient
 
     public function __construct(
         HttpClientInterface $client,
-        string $labelsApiBaseUrl = self::LABELS_API_URL,
+        string $configApiBaseUrl = self::LABELS_API_URL,
+        bool $isEnabled = true,
         RequestStack $request
     ) {
         $this->setClient($client);
-        $this->setBaseUrl($labelsApiBaseUrl);
+        $this->setBaseUrl($configApiBaseUrl);
+        $this->setIsEnabled($isEnabled);
         $token = $request->getCurrentRequest() ? $request->getCurrentRequest()->headers->get('authorization') : false;
 
         if ($token) {
@@ -45,24 +47,39 @@ class Client extends ApiClient
 
     }
 
-    public function getLabelsWithToken($labels, $token, $detailed = null) {
-        // Check if there are params
-        $detailed = isset($detailed) ? '?detailed=' . $detailed : '';
-
+    public function getLabelWithToken($label, $token) {
         $options = [];
 
         // Set token for this request
         $options['auth_bearer'] = $token;
 
         // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_LABELS . '/' . $labels . $detailed;
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_LABELS . '/' . $label;
 
         // Send request
         return $this->handleRequest('GET', $requestUrl, $options);
     }
 
-    public function getLabels($labels, $detailed = null)
+    public function getLabel($label)
     {
-        return $this->getLabelsWithToken($labels, $this->getToken(), $detailed);
+        return $this->getLabelWithToken($label, $this->getToken());
+    }
+
+    public function getLabelsWithToken($filter, $token) {
+        $options = [];
+
+        // Set token for this request
+        $options['auth_bearer'] = $token;
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_LABELS . '/' . $filter;
+
+        // Send request
+        return $this->handleRequest('GET', $requestUrl, $options);
+    }
+
+    public function getLabels($label)
+    {
+        return $this->getLabelsWithToken($label, $this->getToken());
     }
 }

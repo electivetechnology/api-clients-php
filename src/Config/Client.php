@@ -24,14 +24,17 @@ class Client extends ApiClient
 
     public const CONFIG_API_URL     = 'https://config-api.connect.staging.et-ns.net';
     public const PATH_GET_CHANNELS  = '/v1/channels';
+    public const PATH_GET_CHANNEL_TYPE  = '/v1/channel-types';
 
     public function __construct(
         HttpClientInterface $client,
         string $configApiBaseUrl = self::CONFIG_API_URL,
+        bool $isEnabled = true,
         RequestStack $request
     ) {
         $this->setClient($client);
         $this->setBaseUrl($configApiBaseUrl);
+        $this->setIsEnabled($isEnabled);
         $token = $request->getCurrentRequest() ? $request->getCurrentRequest()->headers->get('authorization') : false;
 
         if ($token) {
@@ -45,7 +48,25 @@ class Client extends ApiClient
 
     }
 
-    public function getChannelsWithToken($channel, $token, $detailed = null) {
+    public function getChannelsWithToken($query, $token) {
+        $options = [];
+
+        // Set token for this request
+        $options['auth_bearer'] = $token;
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '/' . $query;
+
+        // Send request
+        return $this->handleRequest('GET', $requestUrl, $options);
+    }
+
+    public function getChannels($query)
+    {
+        return $this->getChannelsWithToken($query, $this->getToken());
+    }
+
+    public function getChannelWithToken($channel, $token, $detailed = null) {
         // Check if there are params
         $detailed = isset($detailed) ? '?detailed=' . $detailed : '';
 
@@ -61,8 +82,26 @@ class Client extends ApiClient
         return $this->handleRequest('GET', $requestUrl, $options);
     }
 
-    public function getChannels($channel, $detailed = null)
+    public function getChannel($channel, $detailed = null)
     {
-        return $this->getChannelsWithToken($channel, $this->getToken(), $detailed);
+        return $this->getChannelWithToken($channel, $this->getToken(), $detailed);
+    }
+
+    public function getChannelTypeWithToken($token) {
+        $options = [];
+
+        // Set token for this request
+        $options['auth_bearer'] = $token;
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNEL_TYPE . '/';
+
+        // Send request
+        return $this->handleRequest('GET', $requestUrl, $options);
+    }
+
+    public function getChannelType()
+    {
+        return $this->getChannelTypeWithToken($this->getToken());
     }
 }

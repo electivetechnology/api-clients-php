@@ -28,10 +28,12 @@ class Client extends ApiClient
     public function __construct(
         HttpClientInterface $client,
         string $candidatesApiBaseUrl = self::CANDIDATE_API_URL,
+        bool $isEnabled = true,
         RequestStack $request
     ) {
         $this->setClient($client);
         $this->setBaseUrl($candidatesApiBaseUrl);
+        $this->setIsEnabled($isEnabled);
         $token = $request->getCurrentRequest() ? $request->getCurrentRequest()->headers->get('authorization') : false;
 
         if ($token) {
@@ -64,5 +66,23 @@ class Client extends ApiClient
     public function getCandidate($candidate, $detailed = null)
     {
         return $this->getCandidateWithToken($candidate, $this->getToken(), $detailed);
+    }
+
+    public function getCandidatesWithToken($filter, $token) {
+        $options = [];
+
+        // Set token for this request
+        $options['auth_bearer'] = $token;
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/' . $filter;
+
+        // Send request
+        return $this->handleRequest('GET', $requestUrl, $options);
+    }
+
+    public function getCandidates($filter)
+    {
+        return $this->getCandidatesWithToken($filter, $this->getToken());
     }
 }

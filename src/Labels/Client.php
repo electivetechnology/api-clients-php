@@ -23,15 +23,6 @@ class Client extends ApiClient
 {
     use Cacheable;
 
-    public const ACTION_VIEW        = 'view';
-    public const ACTION_CREATE      = 'create';
-    public const ACTION_EDIT        = 'edit';
-    public const ACTION_DELETE      = 'delete';
-    public const ACTION_UNDELETE    = 'undelete';
-    public const ACTION_OPERATOR    = 'operator';
-    public const ACTION_MASTER      = 'master';
-    public const ACTION_OWNER       = 'owner';
-
     public const LABELS_API_URL       = 'https://labels-api.connect.staging.et-ns.net';
     public const PATH_GET_LABELS      = '/v1/labels';
 
@@ -63,7 +54,7 @@ class Client extends ApiClient
 
     public function getLabelWithToken($label, $token) {
         // Generate cache key
-        $key  = 'labels' . $label;
+        $key  = 'label' . $label;
 
         // Check cache for data
         $data   = $this->getCacheItem($key);

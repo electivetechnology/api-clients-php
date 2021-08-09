@@ -23,17 +23,8 @@ class Client extends ApiClient
 {
     use Cacheable;
 
-    public const ACTION_VIEW        = 'view';
-    public const ACTION_CREATE      = 'create';
-    public const ACTION_EDIT        = 'edit';
-    public const ACTION_DELETE      = 'delete';
-    public const ACTION_UNDELETE    = 'undelete';
-    public const ACTION_OPERATOR    = 'operator';
-    public const ACTION_MASTER      = 'master';
-    public const ACTION_OWNER       = 'owner';
-
-    public const CONFIG_API_URL     = 'https://config-api.connect.staging.et-ns.net';
-    public const PATH_GET_CHANNELS  = '/v1/channels';
+    public const CONFIG_API_URL          = 'https://config-api.connect.staging.et-ns.net';
+    public const PATH_GET_CHANNELS       = '/v1/channels';
     public const PATH_GET_CHANNEL_TYPE   = '/v1/channel-types';
     public const PATH_GET_CV_COMPLEXITY  = '/v1/candidates/cv-complexity';
 

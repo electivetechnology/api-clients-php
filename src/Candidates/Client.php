@@ -23,15 +23,6 @@ class Client extends ApiClient
 {
     use Cacheable;
 
-    public const ACTION_VIEW        = 'view';
-    public const ACTION_CREATE      = 'create';
-    public const ACTION_EDIT        = 'edit';
-    public const ACTION_DELETE      = 'delete';
-    public const ACTION_UNDELETE    = 'undelete';
-    public const ACTION_OPERATOR    = 'operator';
-    public const ACTION_MASTER      = 'master';
-    public const ACTION_OWNER       = 'owner';
-
     public const CANDIDATE_API_URL       = 'https://candidates-api.connect.staging.et-ns.net';
     public const PATH_GET_CANDIDATE      = '/v1/candidates';
 

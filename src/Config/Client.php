@@ -3,6 +3,14 @@
 namespace Elective\ApiClients\Config;
 
 use Elective\ApiClients\ApiClient;
+use Elective\FormatterBundle\Traits\{
+    Cacheable,
+    Outputable,
+    Filterable,
+    Sortable,
+    Loggable
+};
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -13,6 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class Client extends ApiClient
 {
+    use Cacheable;
+
     public const ACTION_VIEW        = 'view';
     public const ACTION_CREATE      = 'create';
     public const ACTION_EDIT        = 'edit';
@@ -24,17 +34,22 @@ class Client extends ApiClient
 
     public const CONFIG_API_URL     = 'https://config-api.connect.staging.et-ns.net';
     public const PATH_GET_CHANNELS  = '/v1/channels';
-    public const PATH_GET_CHANNEL_TYPE  = '/v1/channel-types';
+    public const PATH_GET_CHANNEL_TYPE   = '/v1/channel-types';
+    public const PATH_GET_CV_COMPLEXITY  = '/v1/candidates/cv-complexity';
 
     public function __construct(
         HttpClientInterface $client,
         string $configApiBaseUrl = self::CONFIG_API_URL,
         bool $isEnabled = true,
-        RequestStack $request
+        RequestStack $request,
+        TagAwareCacheInterface $cacheAdapter = null
     ) {
         $this->setClient($client);
         $this->setBaseUrl($configApiBaseUrl);
         $this->setIsEnabled($isEnabled);
+        if ($cacheAdapter) {
+            $this->setCacheAdapter($cacheAdapter);
+        };
         $token = $request->getCurrentRequest() ? $request->getCurrentRequest()->headers->get('authorization') : false;
 
         if ($token) {
@@ -49,16 +64,28 @@ class Client extends ApiClient
     }
 
     public function getChannelsWithToken($query, $token) {
-        $options = [];
+        // Generate cache key
+        $key = 'channels';
 
-        // Set token for this request
-        $options['auth_bearer'] = $token;
+        // Check cache for data
+        $data = $this->getCacheItem($key);
 
-        // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '/' . $query;
+        $tags = [$key];
 
-        // Send request
-        return $this->handleRequest('GET', $requestUrl, $options);
+        if (!$data) {
+            $options = [];
+    
+            // Set token for this request
+            $options['auth_bearer'] = $token;
+    
+            // Create request URL
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '/' . $query;
+    
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+    
+            // Send request
+            return $this->handleRequest('GET', $requestUrl, $options);
+        }
     }
 
     public function getChannels($query)
@@ -67,19 +94,31 @@ class Client extends ApiClient
     }
 
     public function getChannelWithToken($channel, $token, $detailed = null) {
-        // Check if there are params
-        $detailed = isset($detailed) ? '?detailed=' . $detailed : '';
+        // Generate cache key
+        $key = 'channel' . $channel;
 
-        $options = [];
+        // Check cache for data
+        $data = $this->getCacheItem($key);
 
-        // Set token for this request
-        $options['auth_bearer'] = $token;
+        $tags = [$key];
 
-        // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '/' . $channel . $detailed;
+        if (!$data) {
+            // Check if there are params
+            $detailed = isset($detailed) ? '?detailed=' . $detailed : '';
+    
+            $options = [];
+    
+            // Set token for this request
+            $options['auth_bearer'] = $token;
+    
+            // Create request URL
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '/' . $channel . $detailed;
+    
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
 
-        // Send request
-        return $this->handleRequest('GET', $requestUrl, $options);
+            // Send request
+            return $this->handleRequest('GET', $requestUrl, $options);
+        }
     }
 
     public function getChannel($channel, $detailed = null)
@@ -88,20 +127,62 @@ class Client extends ApiClient
     }
 
     public function getChannelTypeWithToken($token) {
-        $options = [];
+        // Generate cache key
+        $key = 'channelType';
 
-        // Set token for this request
-        $options['auth_bearer'] = $token;
+        // Check cache for data
+        $data = $this->getCacheItem($key);
 
-        // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNEL_TYPE . '/';
+        $tags = [$key];
 
-        // Send request
-        return $this->handleRequest('GET', $requestUrl, $options);
+        if (!$data) {
+            $options = [];
+    
+            // Set token for this request
+            $options['auth_bearer'] = $token;
+    
+            // Create request URL
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNEL_TYPE . '/';
+    
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+
+            // Send request
+            return $this->handleRequest('GET', $requestUrl, $options);
+        }
     }
 
     public function getChannelType()
     {
         return $this->getChannelTypeWithToken($this->getToken());
+    }
+
+    public function getCvComplexityWithToken($token) {
+        // Generate cache key
+        $key = 'cvComplexity';
+
+        // Check cache for data
+        $data = $this->getCacheItem($key);
+
+        $tags = [$key];
+
+        if (!$data) {
+            $options = [];
+            
+            // Set token for this request
+            $options['auth_bearer'] = $token;
+            
+            // Create request URL
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_CV_COMPLEXITY . '/';
+            
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+        
+            // Send request
+            return $this->handleRequest('GET', $requestUrl, $options);
+        }
+    }
+
+    public function getCvComplexity()
+    {
+        return $this->getCvComplexityWithToken($this->getToken());
     }
 }

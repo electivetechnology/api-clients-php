@@ -3,8 +3,16 @@
 namespace Elective\ApiClients\Candidates;
 
 use Elective\ApiClients\ApiClient;
+use Elective\FormatterBundle\Traits\{
+    Cacheable,
+    Outputable,
+    Filterable,
+    Sortable,
+    Loggable
+};
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
  * Elective\ApiClients\Candidates\Client
@@ -13,6 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class Client extends ApiClient
 {
+    use Cacheable;
+
     public const ACTION_VIEW        = 'view';
     public const ACTION_CREATE      = 'create';
     public const ACTION_EDIT        = 'edit';
@@ -29,11 +39,15 @@ class Client extends ApiClient
         HttpClientInterface $client,
         string $candidatesApiBaseUrl = self::CANDIDATE_API_URL,
         bool $isEnabled = true,
-        RequestStack $request
+        RequestStack $request,
+        TagAwareCacheInterface $cacheAdapter = null
     ) {
         $this->setClient($client);
         $this->setBaseUrl($candidatesApiBaseUrl);
         $this->setIsEnabled($isEnabled);
+        if ($cacheAdapter) {
+            $this->setCacheAdapter($cacheAdapter);
+        };
         $token = $request->getCurrentRequest() ? $request->getCurrentRequest()->headers->get('authorization') : false;
 
         if ($token) {
@@ -48,19 +62,33 @@ class Client extends ApiClient
     }
 
     public function getCandidateWithToken($candidate, $token, $detailed = null) {
-        // Check if there are params
-        $detailed = isset($detailed) ? '?detailed=' . $detailed : '';
+        // Generate cache key
+        $key = 'candidate' . $candidate;
+
+        // Check cache for data
+        $data = $this->getCacheItem($key);
+
+        $tags = [$key];
 
         $options = [];
 
-        // Set token for this request
-        $options['auth_bearer'] = $token;
+        if (!$data) {
+            // Check if there are params
+            $detailed = isset($detailed) ? '?detailed=' . $detailed : '';
+    
+            $options = [];
+    
+            // Set token for this request
+            $options['auth_bearer'] = $token;
+    
+            // Create request URL
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/' . $candidate . $detailed;
 
-        // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/' . $candidate . $detailed;
-
-        // Send request
-        return $this->handleRequest('GET', $requestUrl, $options);
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+    
+            // Send request
+            return $this->handleRequest('GET', $requestUrl, $options);
+        }
     }
 
     public function getCandidate($candidate, $detailed = null)
@@ -69,20 +97,64 @@ class Client extends ApiClient
     }
 
     public function getCandidatesWithToken($filter, $token) {
+        // Generate cache key
+        $key = 'candidates';
+
+        // Check cache for data
+        $data = $this->getCacheItem($key);
+
+        $tags = [$key];
+
         $options = [];
 
-        // Set token for this request
-        $options['auth_bearer'] = $token;
+        if (!$data) {
+            $options = [];
+    
+            // Set token for this request
+            $options['auth_bearer'] = $token;
+    
+            // Create request URL
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/' . $filter;
 
-        // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/' . $filter;
-
-        // Send request
-        return $this->handleRequest('GET', $requestUrl, $options);
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+    
+            // Send request
+            return $this->handleRequest('GET', $requestUrl, $options);
+        }
     }
 
     public function getCandidates($filter)
     {
         return $this->getCandidatesWithToken($filter, $this->getToken());
+    }
+
+    public function getNumberOfRecordsWithToken($token) {
+        // Generate cache key
+        $key = 'numberOfRecords';
+
+        // Check cache for data
+        $data = $this->getCacheItem($key);
+
+        $tags = [$key];
+
+        $options = [];
+
+        if (!$data) {
+            // Set token for this request
+            $options['auth_bearer'] = $token;
+    
+            // Create request URL
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/';
+
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+    
+            // Send request
+            return $this->handleRequest('HEAD', $requestUrl, $options);
+        }
+    }
+
+    public function getNumberOfRecords()
+    {
+        return $this->getNumberOfRecordsWithToken($this->getToken());
     }
 }

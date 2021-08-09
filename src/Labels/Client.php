@@ -3,8 +3,16 @@
 namespace Elective\ApiClients\Labels;
 
 use Elective\ApiClients\ApiClient;
+use Elective\FormatterBundle\Traits\{
+    Cacheable,
+    Outputable,
+    Filterable,
+    Sortable,
+    Loggable
+};
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
  * Elective\ApiClients\Labels\Client
@@ -13,6 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class Client extends ApiClient
 {
+    use Cacheable;
+
     public const ACTION_VIEW        = 'view';
     public const ACTION_CREATE      = 'create';
     public const ACTION_EDIT        = 'edit';
@@ -29,11 +39,15 @@ class Client extends ApiClient
         HttpClientInterface $client,
         string $configApiBaseUrl = self::LABELS_API_URL,
         bool $isEnabled = true,
-        RequestStack $request
+        RequestStack $request,
+        TagAwareCacheInterface $cacheAdapter = null
     ) {
         $this->setClient($client);
         $this->setBaseUrl($configApiBaseUrl);
         $this->setIsEnabled($isEnabled);
+        if ($cacheAdapter) {
+            $this->setCacheAdapter($cacheAdapter);
+        };
         $token = $request->getCurrentRequest() ? $request->getCurrentRequest()->headers->get('authorization') : false;
 
         if ($token) {
@@ -48,16 +62,28 @@ class Client extends ApiClient
     }
 
     public function getLabelWithToken($label, $token) {
-        $options = [];
+        // Generate cache key
+        $key  = 'labels' . $label;
 
-        // Set token for this request
-        $options['auth_bearer'] = $token;
+        // Check cache for data
+        $data   = $this->getCacheItem($key);
 
-        // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_LABELS . '/' . $label;
+        $tags   = [$key];
 
-        // Send request
-        return $this->handleRequest('GET', $requestUrl, $options);
+        if (!$data) {
+            $options = [];
+    
+            // Set token for this request
+            $options['auth_bearer'] = $token;
+    
+            // Create request URL
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_LABELS . '/' . $label;
+
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+    
+            // Send request
+            return $this->handleRequest('GET', $requestUrl, $options);
+        }
     }
 
     public function getLabel($label)
@@ -66,16 +92,28 @@ class Client extends ApiClient
     }
 
     public function getLabelsWithToken($filter, $token) {
-        $options = [];
+        // Generate cache key
+        $key  = 'labels';
 
-        // Set token for this request
-        $options['auth_bearer'] = $token;
+        // Check cache for data
+        $data   = $this->getCacheItem($key);
 
-        // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_LABELS . '/' . $filter;
+        $tags   = [$key];
+    
+        if (!$data) {
+            $options = [];
+    
+            // Set token for this request
+            $options['auth_bearer'] = $token;
+    
+            // Create request URL
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_LABELS . '/' . $filter;
 
-        // Send request
-        return $this->handleRequest('GET', $requestUrl, $options);
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+    
+            // Send request
+            return $this->handleRequest('GET', $requestUrl, $options);
+        }
     }
 
     public function getLabels($label)

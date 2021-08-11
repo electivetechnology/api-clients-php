@@ -147,10 +147,8 @@ class ApiClient
         }
     }
 
-    public function getCacheKey(string $type, $id = null) {
-        $key = $type . $id ? $id : '';
-
-        return $key;
+    public static function getCacheKey(string $type, $id = null): string {
+        return $type . $id;
     }
 
     public function messageFromStatusCode($statusCode)

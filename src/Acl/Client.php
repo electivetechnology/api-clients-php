@@ -45,16 +45,7 @@ class Client extends ApiClient
         if ($cacheAdapter) {
             $this->setCacheAdapter($cacheAdapter);
         };
-        $token = $request->getCurrentRequest() ? $request->getCurrentRequest()->headers->get('authorization'): false;
-
-        if ($token) {
-            $pos = strpos($token, 'Bearer ');
-            if (!is_null($pos)) {
-                $str = substr($token, 7);
-
-                $this->setToken($str);
-            }
-        }
+        $this->getAuthorisationHeader($request);
     }
 
     public function isTokenAuthorised($token, Check $check, array $checks = []): Result

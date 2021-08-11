@@ -134,6 +134,18 @@ class ApiClient
         return $result;
     }
 
+    public function getAuthorisationHeader($request) {
+        $token = $request->getCurrentRequest() ? $request->getCurrentRequest()->headers->get('authorization') : false;
+
+        if ($token) {
+            $pos = strpos($token, 'Bearer');
+            if (!is_null($pos)) {
+                $str = substr($token, 7);
+                $this->setToken($str);
+            }
+        }
+    }
+
     public function messageFromStatusCode($statusCode)
     {
         switch ($statusCode) {

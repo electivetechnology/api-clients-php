@@ -36,15 +36,15 @@ class Client extends ApiClient
         HttpClientInterface $client,
         string $aclApiBaseUrl = self::ACL_API_URL,
         bool $isEnabled = true,
-        RequestStack $request
-        // TagAwareCacheInterface $cacheAdapter = null
+        RequestStack $request,
+        TagAwareCacheInterface $cacheAdapter = null
     ) {
         $this->setClient($client);
         $this->setIsEnabled($isEnabled);
         $this->setBaseUrl($aclApiBaseUrl);
-        // if ($cacheAdapter) {
-        //     $this->setCacheAdapter($cacheAdapter);
-        // };
+        if ($cacheAdapter) {
+            $this->setCacheAdapter($cacheAdapter);
+        };
         $token = $request->getCurrentRequest() ? $request->getCurrentRequest()->headers->get('authorization'): false;
 
         if ($token) {
@@ -59,32 +59,20 @@ class Client extends ApiClient
 
     public function isTokenAuthorised($token, Check $check, array $checks = []): Result
     {
-        // Generate cache key
-        // $key = 'isTokenAuthorised';
+        // Prepare client options
+        $options = [];
 
-        // // Check cache for data
-        // $data = $this->getCacheItem($key);
+        // Set data
+        $options['json'] = $check;
 
-        // $tags = [$key];
+        // Set Token for this request
+        $options['auth_bearer'] = $token;
 
-        // if (!$data) {
-            // Prepare client options
-            $options = [];
-    
-            // Set data
-            $options['json'] = $check;
-    
-            // Set Token for this request
-            $options['auth_bearer'] = $token;
-    
-            // Create request URL
-            $requestUrl = $this->getBaseUrl() . self::PATH_AUTHORISE;
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_AUTHORISE;
 
-            // $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
-            // Send request
-            return $this->handleRequest('POST', $requestUrl, $options);
-        // }
+        // Send request
+        return $this->handleRequest('POST', $requestUrl, $options);
     }
 
     public function isAuthorised(Check $check, array $checks = [])
@@ -95,14 +83,14 @@ class Client extends ApiClient
     public function getOrganisationWithToken($organisation, $token, $detailed = null)
     {
         // Generate cache key
-        // $key = 'organisation' . $organisation;
+        $key = 'organisation' . $organisation;
 
-        // // Check cache for data
-        // $data = $this->getCacheItem($key);
+        // Check cache for data
+        $data = $this->getCacheItem($key);
 
-        // $tags = [$key];
+        $tags = [$key];
 
-        // if (!$data) {
+        if (!$data) {
             $detailed = isset($detailed) ? '?detailed=' . $detailed : '';
             // Prepare client options
             $options = [];
@@ -113,11 +101,11 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation . $detailed;
 
-            // $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
 
             // Send request
             return $this->handleRequest('GET', $requestUrl, $options);
-        // }
+        }
     }
 
     public function getOrganisation($organisation, $detailed = null)
@@ -132,36 +120,24 @@ class Client extends ApiClient
      */
     public function exchangeToken($token, $organisation, $extended = false): ?Result
     {
-        // Generate cache key
-        // $key = 'exchangeToken' .$organisation;
+        $payload = new \StdClass();
+        $payload->organisation = $organisation;
+        $payload->extended = $extended;
 
-        // // Check cache for data
-        // $data = $this->getCacheItem($key);
+        // Prepare client options
+        $options = [];
 
-        // $tags = [$key];
+        // Set Token for this request
+        $options['auth_bearer'] = $token;
 
-        // if (!$data) {
-            $payload = new \StdClass();
-            $payload->organisation = $organisation;
-            $payload->extended = $extended;
-    
-            // Prepare client options
-            $options = [];
-    
-            // Set Token for this request
-            $options['auth_bearer'] = $token;
-    
-            // Set data
-            $options['json'] = $payload;
-    
-            // Create request URL
-            $requestUrl = $this->getBaseUrl() . self::PATH_TOKEN_EXCHANGE;
-    
-            // $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+        // Set data
+        $options['json'] = $payload;
 
-            // Send request
-            return $this->handleRequest('POST', $requestUrl, $options);
-        // }
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_TOKEN_EXCHANGE;
+
+        // Send request
+        return $this->handleRequest('POST', $requestUrl, $options);
     }
 
     public function exchangeCurrentToken($organisation, $extended = null)
@@ -171,176 +147,104 @@ class Client extends ApiClient
 
     public function getServiceAccount($organisation, $id)
     {
-        // Generate cache key
-        // $key = 'getServiceAccount' . $id;
+        // Prepare client options
+        $options = [];
 
-        // // Check cache for data
-        // $data = $this->getCacheItem($key);
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION .
+            '/' . $organisation . '/service-accounts/' .  $id;
 
-        // $tags = [$key];
+        $options['auth_bearer'] = $this->getToken();
 
-        // if (!$data) {
-            // Prepare client options
-            $options = [];
-    
-            // Create request URL
-            $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION .
-                '/' . $organisation . '/service-accounts/' .  $id;
-    
-            $options['auth_bearer'] = $this->getToken();
-
-            // $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
-            return $this->handleRequest('GET', $requestUrl, $options);
-        // }
+        return $this->handleRequest('GET', $requestUrl, $options);
     }
 
     public function createServiceAccount($organisation, $name, $description = '', $detailed = null, $createToken = null, $role = null)
     {
-        // Generate cache key
-        // $key = 'createServiceAccount' . $name;
+        $query = '?';
+        $query .= isset($detailed) ? '&detailed=' . $detailed : '';
+        $query .= isset($createToken) ? '&create-token=' . $createToken : '';
+        // Prepare client options
+        $options = [];
 
-        // // Check cache for data
-        // $data = $this->getCacheItem($key);
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation . '/service-accounts' . $query;
 
-        // $tags = [$key];
+        $options['auth_bearer'] = $this->getToken();
 
-        // if (!$data) {
-            $query = '?';
-            $query .= isset($detailed) ? '&detailed=' . $detailed : '';
-            $query .= isset($createToken) ? '&create-token=' . $createToken : '';
-            // Prepare client options
-            $options = [];
-    
-            // Create request URL
-            $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation . '/service-accounts' . $query;
-    
-            $options['auth_bearer'] = $this->getToken();
-    
-            $options['body'] = json_encode(array("name"  => $name, "description"  => $description, "role"  => $role));
+        $options['body'] = json_encode(array("name"  => $name, "description"  => $description, "role"  => $role));
 
-            // $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
-            // Send request
-            return $this->handleRequest('POST', $requestUrl, $options);
-        // }
+        // Send request
+        return $this->handleRequest('POST', $requestUrl, $options);
     }
 
     public function grantServiceAccountRole($id, $organisation, $role)
     {
-        // Generate cache key
-        // $key = 'grantServiceAccountRole' . $id;
+        // Prepare client options
+        $options = [];
 
-        // // Check cache for data
-        // $data = $this->getCacheItem($key);
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION .
+            '/' . $organisation . '/service-accounts/' .  $id . '/grant';
 
-        // $tags = [$key];
+        $options['auth_bearer'] = $this->getToken();
 
-        // if (!$data) {
-            // Prepare client options
-            $options = [];
-    
-            // Create request URL
-            $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION .
-                '/' . $organisation . '/service-accounts/' .  $id . '/grant';
-    
-            $options['auth_bearer'] = $this->getToken();
-    
-            $options['body'] = json_encode(array("role" => $role));
-    
-            // $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
-            // Send request
-            return $this->handleRequest('POST', $requestUrl, $options);
-        // }
+        $options['body'] = json_encode(array("role" => $role));
+
+        // Send request
+        return $this->handleRequest('POST', $requestUrl, $options);
     }
 
     public function getUserDetails($username)
     {
-        // Generate cache key
-        // $key = 'getUserDetails' . $username;
+        $filter = '?filters[]=and-user.username-eq-value-' . $username;
+        
+        // Prepare client options
+        $options = [];
+        
+        // Set Token for this request
+        $options['auth_bearer'] = $this->getToken();
+        
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_GET_USERS . $filter;
 
-        // // Check cache for data
-        // $data = $this->getCacheItem($key);
-
-        // $tags = [$key];
-
-        // if (!$data) {
-            $filter = '?filters[]=and-user.username-eq-value-' . $username;
-            
-            // Prepare client options
-            $options = [];
-            
-            // Set Token for this request
-            $options['auth_bearer'] = $this->getToken();
-            
-            // Create request URL
-            $requestUrl = $this->getBaseUrl() . self::PATH_GET_USERS . $filter;
-    
-            // $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-
-            // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
-        // }
+        // Send request
+        return $this->handleRequest('GET', $requestUrl, $options);
     }
 
     public function readRole($spec)
     {
-        // Generate cache key
-        // $key = 'readRole';
+        // Prepare client options
+        $options = [];
 
-        // // Check cache for data
-        // $data = $this->getCacheItem($key);
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_ROLE . '/' . $spec;
 
-        // $tags = [$key];
+        $options['auth_bearer'] = $this->getToken();
 
-        // if (!$data) {
-            // Prepare client options
-            $options = [];
-    
-            // Create request URL
-            $requestUrl = $this->getBaseUrl() . self::PATH_ROLE . '/' . $spec;
-    
-            $options['auth_bearer'] = $this->getToken();
-
-            // $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
-            // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
-        // }
+        // Send request
+        return $this->handleRequest('GET', $requestUrl, $options);
     }
 
     public function createRole($name, $description = '', $permissionGroups = [], $type = false)
     {
-        // Generate cache key
-        // $key = 'createRole' . $name;
+        // Prepare client options
+        $options = [];
 
-        // // Check cache for data
-        // $data = $this->getCacheItem($key);
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_ROLE;
 
-        // $tags = [$key];
+        $options['auth_bearer'] = $this->getToken();
 
-        // if (!$data) {
-            // Prepare client options
-            $options = [];
-    
-            // Create request URL
-            $requestUrl = $this->getBaseUrl() . self::PATH_ROLE;
-    
-            $options['auth_bearer'] = $this->getToken();
-    
-            $body = array("name" => $name, "description" => $description, "permissionGroups" => $permissionGroups);
-    
-            if ($type) {
-                $body['type'] = $type;
-            }
-    
-            $options['body'] = json_encode($body);
+        $body = array("name" => $name, "description" => $description, "permissionGroups" => $permissionGroups);
 
-            // $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
-            // Send request
-            return $this->handleRequest('POST', $requestUrl, $options);
-        // }
+        if ($type) {
+            $body['type'] = $type;
+        }
+
+        $options['body'] = json_encode($body);
+
+        // Send request
+        return $this->handleRequest('POST', $requestUrl, $options);
     }
 }

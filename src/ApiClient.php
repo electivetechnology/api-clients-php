@@ -7,6 +7,7 @@ namespace Elective\ApiClients;
 use Elective\ApiClients\Result;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Elective\ApiClients\ApiClient
@@ -34,6 +35,15 @@ class ApiClient
      * Token
      */
     private $token;
+
+    public const ACTION_VIEW        = 'view';
+    public const ACTION_CREATE      = 'create';
+    public const ACTION_EDIT        = 'edit';
+    public const ACTION_DELETE      = 'delete';
+    public const ACTION_UNDELETE    = 'undelete';
+    public const ACTION_OPERATOR    = 'operator';
+    public const ACTION_MASTER      = 'master';
+    public const ACTION_OWNER       = 'owner';
 
     public function __construct(HttpClientInterface $client, bool $isEnabled = true)
     {
@@ -123,6 +133,22 @@ class ApiClient
         }
 
         return $result;
+    }
+
+    public function getAuthorisationHeader(RequestStack $request) {
+        $token = $request->getCurrentRequest() ? $request->getCurrentRequest()->headers->get('authorization') : false;
+
+        if ($token) {
+            $pos = strpos($token, 'Bearer');
+            if (!is_null($pos)) {
+                $str = substr($token, 7);
+                $this->setToken($str);
+            }
+        }
+    }
+
+    public static function getCacheKey(string $type, $id = null): string {
+        return $type . $id;
     }
 
     public function messageFromStatusCode($statusCode)

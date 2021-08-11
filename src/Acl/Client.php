@@ -5,6 +5,14 @@ namespace Elective\ApiClients\Acl;
 use Elective\ApiClients\Result;
 use Elective\ApiClients\ApiClient;
 use Elective\ApiClients\Acl\Authorisation\Check;
+use Elective\FormatterBundle\Traits\{
+    Cacheable,
+    Outputable,
+    Filterable,
+    Sortable,
+    Loggable
+};
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -15,41 +23,30 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class Client extends ApiClient
 {
-    public const ACTION_VIEW        = 'view';
-    public const ACTION_CREATE      = 'create';
-    public const ACTION_EDIT        = 'edit';
-    public const ACTION_DELETE      = 'delete';
-    public const ACTION_UNDELETE    = 'undelete';
-    public const ACTION_OPERATOR    = 'operator';
-    public const ACTION_MASTER      = 'master';
-    public const ACTION_OWNER       = 'owner';
+    use Cacheable;
 
-    public const ACL_API_URL        = 'https://acl-api.connect.staging.et-ns.net';
-    public const PATH_AUTHORISE     = '/v1/authorise';
+    public const ACL_API_URL            = 'https://acl-api.connect.staging.et-ns.net';
+    public const PATH_AUTHORISE         = '/v1/authorise';
     public const PATH_GET_ORGANISATION  = '/v1/organisations';
     public const PATH_TOKEN_EXCHANGE    = '/v1/token/exchange';
     public const PATH_GET_USERS         = '/v1/users';
     public const PATH_ROLE              = '/v1/roles';
+    public const ORGANISATION           = 'organisation';
 
     public function __construct(
         HttpClientInterface $client,
         string $aclApiBaseUrl = self::ACL_API_URL,
         bool $isEnabled = true,
-        RequestStack $request
+        RequestStack $request,
+        TagAwareCacheInterface $cacheAdapter = null
     ) {
         $this->setClient($client);
         $this->setIsEnabled($isEnabled);
         $this->setBaseUrl($aclApiBaseUrl);
-        $token = $request->getCurrentRequest() ? $request->getCurrentRequest()->headers->get('authorization'): false;
-
-        if ($token) {
-            $pos = strpos($token, 'Bearer ');
-            if (!is_null($pos)) {
-                $str = substr($token, 7);
-
-                $this->setToken($str);
-            }
-        }
+        if ($cacheAdapter) {
+            $this->setCacheAdapter($cacheAdapter);
+        };
+        $this->getAuthorisationHeader($request);
     }
 
     public function isTokenAuthorised($token, Check $check, array $checks = []): Result
@@ -77,18 +74,31 @@ class Client extends ApiClient
 
     public function getOrganisationWithToken($organisation, $token, $detailed = null)
     {
-        $detailed = isset($detailed) ? '?detailed=' . $detailed : '';
-        // Prepare client options
-        $options = [];
+        // Generate cache key
+        $key = self::getCacheKey(self::ORGANISATION, $organisation);
 
-        // Set Token for this request
-        $options['auth_bearer'] = $token;
+        // Check cache for data
+        $data = $this->getCacheItem($key);
 
-        // Create request URL
-        $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation . $detailed;
+        $tags = [$key];
 
-        // Send request
-        return $this->handleRequest('GET', $requestUrl, $options);
+        if (!$data) {
+
+            $detailed = isset($detailed) ? '?detailed=' . $detailed : '';
+            // Prepare client options
+            $options = [];
+
+            // Set Token for this request
+            $options['auth_bearer'] = $token;
+
+            // Create request URL
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation . $detailed;
+
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+
+            // Send request
+            return $this->handleRequest('GET', $requestUrl, $options);
+        }
     }
 
     public function getOrganisation($organisation, $detailed = null)

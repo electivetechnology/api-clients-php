@@ -47,7 +47,7 @@ class Client extends ApiClient
 
     public function getLabelWithToken($label, $token) {
         // Generate cache key
-        $key  = $this->getCacheKey(self::LABEL, $label);
+        $key  = ApiClient::getCacheKey(self::LABEL, $label);
 
         // Check cache for data
         $data   = $this->getCacheItem($key);
@@ -78,7 +78,7 @@ class Client extends ApiClient
 
     public function getLabelsWithToken($filter, $token) {
         // Generate cache key
-        $key  = $this->getCacheKey(self::LABELS);
+        $key  = ApiClient::getCacheKey(self::LABELS);
 
         // Check cache for data
         $data   = $this->getCacheItem($key);

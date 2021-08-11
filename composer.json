@@ -12,9 +12,9 @@
     ],
     "require": {
         "php": "^7.1.13",
-        "electivegroup/formatter-bundle": "^2.2",
+        "electivegroup/formatter-bundle": "^0",
         "symfony/http-client": "^4.4|^5",
-        "symfony/http-foundation": "^5.3"
+        "symfony/http-foundation": "^4.4|^5"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3",

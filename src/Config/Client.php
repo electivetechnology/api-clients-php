@@ -27,6 +27,10 @@ class Client extends ApiClient
     public const PATH_GET_CHANNELS       = '/v1/channels';
     public const PATH_GET_CHANNEL_TYPE   = '/v1/channel-types';
     public const PATH_GET_CV_COMPLEXITY  = '/v1/candidates/cv-complexity';
+    public const CV_COMPLEXITY           = 'cvComplexity';
+    public const CHANNEL                 = 'channel';
+    public const CHANNELS                = 'channels';
+    public const CHANNEL_TYPE            = 'channelType';
 
     public function __construct(
         HttpClientInterface $client,
@@ -47,7 +51,7 @@ class Client extends ApiClient
 
     public function getChannelsWithToken($query, $token) {
         // Generate cache key
-        $key = 'channels';
+        $key = $this->getCacheKey(self::CHANNELS);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -55,6 +59,7 @@ class Client extends ApiClient
         $tags = [$key];
 
         if (!$data) {
+
             $options = [];
     
             // Set token for this request
@@ -77,7 +82,7 @@ class Client extends ApiClient
 
     public function getChannelWithToken($channel, $token, $detailed = null) {
         // Generate cache key
-        $key = 'channel' . $channel;
+        $key = $this->getCacheKey(self::CHANNEL, $channel);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -110,7 +115,7 @@ class Client extends ApiClient
 
     public function getChannelTypeWithToken($token) {
         // Generate cache key
-        $key = 'channelType';
+        $key = $this->getCacheKey(self::CHANNEL_TYPE);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -118,6 +123,7 @@ class Client extends ApiClient
         $tags = [$key];
 
         if (!$data) {
+    
             $options = [];
     
             // Set token for this request
@@ -140,7 +146,7 @@ class Client extends ApiClient
 
     public function getCvComplexityWithToken($token) {
         // Generate cache key
-        $key = 'cvComplexity';
+        $key = $this->getCacheKey(self::CV_COMPLEXITY);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -148,6 +154,7 @@ class Client extends ApiClient
         $tags = [$key];
 
         if (!$data) {
+    
             $options = [];
             
             // Set token for this request

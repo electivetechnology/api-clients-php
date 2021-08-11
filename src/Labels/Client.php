@@ -25,6 +25,8 @@ class Client extends ApiClient
 
     public const LABELS_API_URL       = 'https://labels-api.connect.staging.et-ns.net';
     public const PATH_GET_LABELS      = '/v1/labels';
+    public const LABELS               = 'labels';
+    public const LABEL                = 'label';
 
     public function __construct(
         HttpClientInterface $client,
@@ -45,7 +47,7 @@ class Client extends ApiClient
 
     public function getLabelWithToken($label, $token) {
         // Generate cache key
-        $key  = 'label' . $label;
+        $key  = $this->getCacheKey(self::LABEL, $label);
 
         // Check cache for data
         $data   = $this->getCacheItem($key);
@@ -53,6 +55,7 @@ class Client extends ApiClient
         $tags   = [$key];
 
         if (!$data) {
+    
             $options = [];
     
             // Set token for this request
@@ -75,7 +78,7 @@ class Client extends ApiClient
 
     public function getLabelsWithToken($filter, $token) {
         // Generate cache key
-        $key  = 'labels';
+        $key  = $this->getCacheKey(self::LABELS);
 
         // Check cache for data
         $data   = $this->getCacheItem($key);
@@ -83,6 +86,7 @@ class Client extends ApiClient
         $tags   = [$key];
     
         if (!$data) {
+    
             $options = [];
     
             // Set token for this request

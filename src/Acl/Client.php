@@ -31,6 +31,7 @@ class Client extends ApiClient
     public const PATH_TOKEN_EXCHANGE    = '/v1/token/exchange';
     public const PATH_GET_USERS         = '/v1/users';
     public const PATH_ROLE              = '/v1/roles';
+    public const ORGANISATION           = 'organisation';
 
     public function __construct(
         HttpClientInterface $client,
@@ -74,7 +75,7 @@ class Client extends ApiClient
     public function getOrganisationWithToken($organisation, $token, $detailed = null)
     {
         // Generate cache key
-        $key = 'organisation' . $organisation;
+        $key = $this->getCacheKey(self::ORGANISATION, $organisation);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -82,6 +83,7 @@ class Client extends ApiClient
         $tags = [$key];
 
         if (!$data) {
+
             $detailed = isset($detailed) ? '?detailed=' . $detailed : '';
             // Prepare client options
             $options = [];

@@ -25,6 +25,9 @@ class Client extends ApiClient
 
     public const CANDIDATE_API_URL       = 'https://candidates-api.connect.staging.et-ns.net';
     public const PATH_GET_CANDIDATE      = '/v1/candidates';
+    public const CANDIDATE               = 'candidate';
+    public const CANDIDATES              = 'candidates';
+    public const NUMBER_OF_RECORDS       = 'numberOfRecords';
 
     public function __construct(
         HttpClientInterface $client,
@@ -45,14 +48,12 @@ class Client extends ApiClient
 
     public function getCandidateWithToken($candidate, $token, $detailed = null) {
         // Generate cache key
-        $key = 'candidate' . $candidate;
+        $key = $this->getCacheKey(self::CANDIDATE, $candidate);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         $tags = [$key];
-
-        $options = [];
 
         if (!$data) {
             // Check if there are params
@@ -80,16 +81,15 @@ class Client extends ApiClient
 
     public function getCandidatesWithToken($filter, $token) {
         // Generate cache key
-        $key = 'candidates';
+        $key = $this->getCacheKey(self::CANDIDATES);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         $tags = [$key];
 
-        $options = [];
-
         if (!$data) {
+
             $options = [];
     
             // Set token for this request
@@ -112,16 +112,16 @@ class Client extends ApiClient
 
     public function getNumberOfRecordsWithToken($token) {
         // Generate cache key
-        $key = 'numberOfRecords';
+        $key = $this->getCacheKey(self::NUMBER_OF_RECORDS);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         $tags = [$key];
 
-        $options = [];
-
         if (!$data) {
+    
+            $options = [];
             // Set token for this request
             $options['auth_bearer'] = $token;
     

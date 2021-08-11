@@ -51,7 +51,7 @@ class Client extends ApiClient
 
     public function getChannelsWithToken($query, $token) {
         // Generate cache key
-        $key = ApiClient::getCacheKey(self::CHANNELS);
+        $key = self::getCacheKey(self::CHANNELS);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -82,7 +82,7 @@ class Client extends ApiClient
 
     public function getChannelWithToken($channel, $token, $detailed = null) {
         // Generate cache key
-        $key = ApiClient::getCacheKey(self::CHANNEL, $channel);
+        $key = self::getCacheKey(self::CHANNEL, $channel);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -115,7 +115,7 @@ class Client extends ApiClient
 
     public function getChannelTypeWithToken($token) {
         // Generate cache key
-        $key = ApiClient::getCacheKey(self::CHANNEL_TYPE);
+        $key = self::getCacheKey(self::CHANNEL_TYPE);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -146,7 +146,7 @@ class Client extends ApiClient
 
     public function getCvComplexityWithToken($token) {
         // Generate cache key
-        $key = ApiClient::getCacheKey(self::CV_COMPLEXITY);
+        $key = self::getCacheKey(self::CV_COMPLEXITY);
 
         // Check cache for data
         $data = $this->getCacheItem($key);

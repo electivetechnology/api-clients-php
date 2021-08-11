@@ -48,7 +48,7 @@ class Client extends ApiClient
 
     public function getCandidateWithToken($candidate, $token, $detailed = null) {
         // Generate cache key
-        $key = ApiClient::getCacheKey(self::CANDIDATE, $candidate);
+        $key = self::getCacheKey(self::CANDIDATE, $candidate);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -81,7 +81,7 @@ class Client extends ApiClient
 
     public function getCandidatesWithToken($filter, $token) {
         // Generate cache key
-        $key = ApiClient::getCacheKey(self::CANDIDATES);
+        $key = self::getCacheKey(self::CANDIDATES);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -112,7 +112,7 @@ class Client extends ApiClient
 
     public function getNumberOfRecordsWithToken($token) {
         // Generate cache key
-        $key = ApiClient::getCacheKey(self::NUMBER_OF_RECORDS);
+        $key = self::getCacheKey(self::NUMBER_OF_RECORDS);
 
         // Check cache for data
         $data = $this->getCacheItem($key);

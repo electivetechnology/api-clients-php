@@ -90,7 +90,7 @@ class Client extends ApiClient
     public function getCandidatesWithToken($filter, $token): Result
     {
         // Generate cache key
-        $key = self::getCacheKey(self::CANDIDATES);
+        $key = self::getCacheKey(self::CANDIDATES, $filter);
 
         // Check cache for data
         $data = $this->getCacheItem($key);

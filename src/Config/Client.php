@@ -55,7 +55,7 @@ class Client extends ApiClient
     public function getChannelsWithToken($query, $token): Result
     {
         // Generate cache key
-        $key = self::getCacheKey(self::CHANNELS);
+        $key = self::getCacheKey(self::CHANNELS, $query);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -183,7 +183,7 @@ class Client extends ApiClient
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CV_COMPLEXITY . '/';
             
             // Send request
-            $ret = $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
 
             if ($data->isSuccessful()) {
                 $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);

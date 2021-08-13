@@ -74,7 +74,7 @@ class Client extends ApiClient
         return $this->isTokenAuthorised($this->getToken(), $check, $checks);
     }
 
-    public function getOrganisationWithToken($organisation, $token, $detailed = null)
+    public function getOrganisationWithToken($organisation, $token, $detailed = null): Result
     {
         // Generate cache key
         $key = self::getCacheKey(self::ORGANISATION, $organisation);
@@ -97,13 +97,11 @@ class Client extends ApiClient
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation . $detailed;
             
             // Send request
-            $ret = $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
     
-            $data = $ret;
-            
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-
-            return $ret;
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
 
         return $data;

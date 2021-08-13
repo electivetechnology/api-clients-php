@@ -2,6 +2,7 @@
 
 namespace Elective\ApiClients\Labels;
 
+use Elective\ApiClients\Result;
 use Elective\ApiClients\ApiClient;
 use Elective\FormatterBundle\Traits\{
     Cacheable,
@@ -47,7 +48,8 @@ class Client extends ApiClient
         $this->getAuthorisationHeader($request);
     }
 
-    public function getLabelWithToken($label, $token) {
+    public function getLabelWithToken($label, $token): Result 
+    {
         // Generate cache key
         $key  = self::getCacheKey(self::LABEL, $label);
 
@@ -67,13 +69,11 @@ class Client extends ApiClient
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_LABELS . '/' . $label;
 
             // Send request
-            $ret = $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
 
-            $data = $ret;
-
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
-            return $ret;
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
 
         return $data;
@@ -84,7 +84,8 @@ class Client extends ApiClient
         return $this->getLabelWithToken($label, $this->getToken());
     }
 
-    public function getLabelsWithToken($filter, $token) {
+    public function getLabelsWithToken($filter, $token): Result 
+    {
         // Generate cache key
         $key  = self::getCacheKey(self::LABELS . $filter);
 
@@ -104,15 +105,13 @@ class Client extends ApiClient
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_LABELS . '/' . $filter;
 
             // Send request
-            $ret = $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
 
-            $data = $ret;
-    
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-
-            return $ret;
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
-    
+
         return $data;
     }
 

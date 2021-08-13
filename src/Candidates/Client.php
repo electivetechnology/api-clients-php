@@ -2,6 +2,7 @@
 
 namespace Elective\ApiClients\Candidates;
 
+use Elective\ApiClients\Result;
 use Elective\ApiClients\ApiClient;
 use Elective\FormatterBundle\Traits\{
     Cacheable,
@@ -48,7 +49,8 @@ class Client extends ApiClient
         $this->getAuthorisationHeader($request);
     }
 
-    public function getCandidateWithToken($candidate, $token, $detailed = null) {
+    public function getCandidateWithToken($candidate, $token, $detailed = null): Result
+    {
         // Generate cache key
         $key = self::getCacheKey(self::CANDIDATE, $candidate);
 
@@ -70,14 +72,13 @@ class Client extends ApiClient
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/' . $candidate . $detailed;
 
             // Send request
-            $ret = $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
 
-            $data = $ret;
-
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
-            return $ret;
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
+
         return $data;
     }
 
@@ -86,7 +87,8 @@ class Client extends ApiClient
         return $this->getCandidateWithToken($candidate, $this->getToken(), $detailed);
     }
 
-    public function getCandidatesWithToken($filter, $token) {
+    public function getCandidatesWithToken($filter, $token): Result
+    {
         // Generate cache key
         $key = self::getCacheKey(self::CANDIDATES);
 
@@ -106,13 +108,11 @@ class Client extends ApiClient
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/' . $filter;
 
             // Send request
-            $ret = $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
 
-            $data = $ret;
-
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-
-            return $ret;
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
 
         return $data;
@@ -123,7 +123,8 @@ class Client extends ApiClient
         return $this->getCandidatesWithToken($filter, $this->getToken());
     }
 
-    public function getNumberOfRecordsWithToken($token) {
+    public function getNumberOfRecordsWithToken($token): Result
+    {
         // Generate cache key
         $key = self::getCacheKey(self::NUMBER_OF_RECORDS);
 
@@ -142,13 +143,11 @@ class Client extends ApiClient
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/';
 
             // Send request
-            $ret = $this->handleRequest('HEAD', $requestUrl, $options);
+            $data = $this->handleRequest('HEAD', $requestUrl, $options);
 
-            $data = $ret;
-
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-            
-            return $ret;
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
 
         return $data;

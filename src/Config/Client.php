@@ -2,6 +2,7 @@
 
 namespace Elective\ApiClients\Config;
 
+use Elective\ApiClients\Result;
 use Elective\ApiClients\ApiClient;
 use Elective\FormatterBundle\Traits\{
     Cacheable,
@@ -51,7 +52,8 @@ class Client extends ApiClient
         $this->getAuthorisationHeader($request);
     }
 
-    public function getChannelsWithToken($query, $token) {
+    public function getChannelsWithToken($query, $token): Result
+    {
         // Generate cache key
         $key = self::getCacheKey(self::CHANNELS);
 
@@ -71,13 +73,11 @@ class Client extends ApiClient
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '/' . $query;
     
             // Send request
-            $ret = $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
 
-            $data = $ret;
-        
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
-            return $ret;
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
 
         return $data;
@@ -88,7 +88,8 @@ class Client extends ApiClient
         return $this->getChannelsWithToken($query, $this->getToken());
     }
 
-    public function getChannelWithToken($channel, $token, $detailed = null) {
+    public function getChannelWithToken($channel, $token, $detailed = null): Result
+    {
         // Generate cache key
         $key = self::getCacheKey(self::CHANNEL, $channel);
 
@@ -110,13 +111,11 @@ class Client extends ApiClient
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '/' . $channel . $detailed;
     
             // Send request
-            $ret = $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
 
-            $data = $ret;
-
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-
-            return $ret;
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
 
         return $data;
@@ -127,7 +126,8 @@ class Client extends ApiClient
         return $this->getChannelWithToken($channel, $this->getToken(), $detailed);
     }
 
-    public function getChannelTypeWithToken($token) {
+    public function getChannelTypeWithToken($token): Result
+    {
         // Generate cache key
         $key = self::getCacheKey(self::CHANNEL_TYPE);
 
@@ -146,14 +146,12 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNEL_TYPE . '/';
     
-            $ret = $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
     
-            $data = $ret;
-        
-            // Send request
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-
-            return $ret;
+            if ($data->isSuccessful()) {
+                // Send request
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
 
         return $data;
@@ -164,7 +162,8 @@ class Client extends ApiClient
         return $this->getChannelTypeWithToken($this->getToken());
     }
 
-    public function getCvComplexityWithToken($token) {
+    public function getCvComplexityWithToken($token): Result 
+    {
         // Generate cache key
         $key = self::getCacheKey(self::CV_COMPLEXITY);
 
@@ -186,11 +185,9 @@ class Client extends ApiClient
             // Send request
             $ret = $this->handleRequest('GET', $requestUrl, $options);
 
-            $data = $ret;
-            
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-
-            return $ret;
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
 
         return $data;

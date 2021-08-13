@@ -34,7 +34,8 @@ class Client extends ApiClient
         string $candidatesApiBaseUrl = self::CANDIDATE_API_URL,
         bool $isEnabled = true,
         RequestStack $request,
-        TagAwareCacheInterface $cacheAdapter = null
+        TagAwareCacheInterface $cacheAdapter = null,
+        $defaultLifetime = 0
     ) {
         $this->setClient($client);
         $this->setBaseUrl($candidatesApiBaseUrl);
@@ -42,6 +43,7 @@ class Client extends ApiClient
         if ($cacheAdapter) {
             $this->setCacheAdapter($cacheAdapter);
         };
+        $this->setDefaultLifetime($defaultLifetime);
     
         $this->getAuthorisationHeader($request);
     }
@@ -67,11 +69,16 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/' . $candidate . $detailed;
 
+            // Send request
+            $ret = $this->handleRequest('GET', $requestUrl, $options);
+
+            $data = $ret;
+
             $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
     
-            // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            return $ret;
         }
+        return $data;
     }
 
     public function getCandidate($candidate, $detailed = null)
@@ -98,11 +105,15 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/' . $filter;
 
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
             // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            $ret = $this->handleRequest('GET', $requestUrl, $options);
+
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+
+            return $ret;
         }
+
+        return $data;
     }
 
     public function getCandidates($filter)
@@ -128,11 +139,17 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/';
 
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
             // Send request
-            return $this->handleRequest('HEAD', $requestUrl, $options);
+            $ret = $this->handleRequest('HEAD', $requestUrl, $options);
+
+            $data = $ret;
+
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            
+            return $ret;
         }
+
+        return $data;
     }
 
     public function getNumberOfRecords()

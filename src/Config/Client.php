@@ -37,7 +37,8 @@ class Client extends ApiClient
         string $configApiBaseUrl = self::CONFIG_API_URL,
         bool $isEnabled = true,
         RequestStack $request,
-        TagAwareCacheInterface $cacheAdapter = null
+        TagAwareCacheInterface $cacheAdapter = null,
+        $defaultLifetime = 0
     ) {
         $this->setClient($client);
         $this->setBaseUrl($configApiBaseUrl);
@@ -45,6 +46,7 @@ class Client extends ApiClient
         if ($cacheAdapter) {
             $this->setCacheAdapter($cacheAdapter);
         };
+        $this->setDefaultLifetime($defaultLifetime);
     
         $this->getAuthorisationHeader($request);
     }
@@ -68,11 +70,17 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '/' . $query;
     
+            // Send request
+            $ret = $this->handleRequest('GET', $requestUrl, $options);
+
+            $data = $ret;
+        
             $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
     
-            // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            return $ret;
         }
+
+        return $data;
     }
 
     public function getChannels($query)
@@ -101,11 +109,17 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '/' . $channel . $detailed;
     
+            // Send request
+            $ret = $this->handleRequest('GET', $requestUrl, $options);
+
+            $data = $ret;
+
             $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
 
-            // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            return $ret;
         }
+
+        return $data;
     }
 
     public function getChannel($channel, $detailed = null)
@@ -132,11 +146,17 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNEL_TYPE . '/';
     
+            $ret = $this->handleRequest('GET', $requestUrl, $options);
+    
+            $data = $ret;
+        
+            // Send request
             $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
 
-            // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            return $ret;
         }
+
+        return $data;
     }
 
     public function getChannelType()
@@ -163,11 +183,17 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CV_COMPLEXITY . '/';
             
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-        
             // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            $ret = $this->handleRequest('GET', $requestUrl, $options);
+
+            $data = $ret;
+            
+            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+
+            return $ret;
         }
+
+        return $data;
     }
 
     public function getCvComplexity()

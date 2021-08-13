@@ -108,6 +108,8 @@ class Client extends ApiClient
             // Send request
             $ret = $this->handleRequest('GET', $requestUrl, $options);
 
+            $data = $ret;
+
             $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
 
             return $ret;

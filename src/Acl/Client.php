@@ -38,7 +38,8 @@ class Client extends ApiClient
         string $aclApiBaseUrl = self::ACL_API_URL,
         bool $isEnabled = true,
         RequestStack $request,
-        TagAwareCacheInterface $cacheAdapter = null
+        TagAwareCacheInterface $cacheAdapter = null,
+        $defaultLifetime = 0
     ) {
         $this->setClient($client);
         $this->setIsEnabled($isEnabled);
@@ -46,6 +47,7 @@ class Client extends ApiClient
         if ($cacheAdapter) {
             $this->setCacheAdapter($cacheAdapter);
         };
+        $this->setDefaultLifetime($defaultLifetime);
         $this->getAuthorisationHeader($request);
     }
 
@@ -72,7 +74,7 @@ class Client extends ApiClient
         return $this->isTokenAuthorised($this->getToken(), $check, $checks);
     }
 
-    public function getOrganisationWithToken($organisation, $token, $detailed = null)
+    public function getOrganisationWithToken($organisation, $token, $detailed = null): Result
     {
         // Generate cache key
         $key = self::getCacheKey(self::ORGANISATION, $organisation);
@@ -93,12 +95,16 @@ class Client extends ApiClient
 
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION . '/' . $organisation . $detailed;
-
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-
+            
             // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
+    
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
+
+        return $data;
     }
 
     public function getOrganisation($organisation, $detailed = null)

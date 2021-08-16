@@ -2,6 +2,7 @@
 
 namespace Elective\ApiClients\Config;
 
+use Elective\ApiClients\Result;
 use Elective\ApiClients\ApiClient;
 use Elective\FormatterBundle\Traits\{
     Cacheable,
@@ -37,7 +38,8 @@ class Client extends ApiClient
         string $configApiBaseUrl = self::CONFIG_API_URL,
         bool $isEnabled = true,
         RequestStack $request,
-        TagAwareCacheInterface $cacheAdapter = null
+        TagAwareCacheInterface $cacheAdapter = null,
+        $defaultLifetime = 0
     ) {
         $this->setClient($client);
         $this->setBaseUrl($configApiBaseUrl);
@@ -45,13 +47,15 @@ class Client extends ApiClient
         if ($cacheAdapter) {
             $this->setCacheAdapter($cacheAdapter);
         };
+        $this->setDefaultLifetime($defaultLifetime);
     
         $this->getAuthorisationHeader($request);
     }
 
-    public function getChannelsWithToken($query, $token) {
+    public function getChannelsWithToken($query, $token): Result
+    {
         // Generate cache key
-        $key = self::getCacheKey(self::CHANNELS);
+        $key = self::getCacheKey(self::CHANNELS, $query);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -68,19 +72,24 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '/' . $query;
     
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
             // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
+
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
+
+        return $data;
     }
 
-    public function getChannels($query)
+    public function getChannels($query = null)
     {
         return $this->getChannelsWithToken($query, $this->getToken());
     }
 
-    public function getChannelWithToken($channel, $token, $detailed = null) {
+    public function getChannelWithToken($channel, $token, $detailed = null): Result
+    {
         // Generate cache key
         $key = self::getCacheKey(self::CHANNEL, $channel);
 
@@ -101,11 +110,15 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '/' . $channel . $detailed;
     
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-
             // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
+
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
+
+        return $data;
     }
 
     public function getChannel($channel, $detailed = null)
@@ -113,7 +126,8 @@ class Client extends ApiClient
         return $this->getChannelWithToken($channel, $this->getToken(), $detailed);
     }
 
-    public function getChannelTypeWithToken($token) {
+    public function getChannelTypeWithToken($token): Result
+    {
         // Generate cache key
         $key = self::getCacheKey(self::CHANNEL_TYPE);
 
@@ -132,11 +146,15 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNEL_TYPE . '/';
     
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-
-            // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
+    
+            if ($data->isSuccessful()) {
+                // Send request
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
+
+        return $data;
     }
 
     public function getChannelType()
@@ -144,7 +162,8 @@ class Client extends ApiClient
         return $this->getChannelTypeWithToken($this->getToken());
     }
 
-    public function getCvComplexityWithToken($token) {
+    public function getCvComplexityWithToken($token): Result 
+    {
         // Generate cache key
         $key = self::getCacheKey(self::CV_COMPLEXITY);
 
@@ -163,11 +182,15 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_CV_COMPLEXITY . '/';
             
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-        
             // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
+
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
+
+        return $data;
     }
 
     public function getCvComplexity()

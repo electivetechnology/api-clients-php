@@ -2,6 +2,7 @@
 
 namespace Elective\ApiClients\Labels;
 
+use Elective\ApiClients\Result;
 use Elective\ApiClients\ApiClient;
 use Elective\FormatterBundle\Traits\{
     Cacheable,
@@ -33,7 +34,8 @@ class Client extends ApiClient
         string $configApiBaseUrl = self::LABELS_API_URL,
         bool $isEnabled = true,
         RequestStack $request,
-        TagAwareCacheInterface $cacheAdapter = null
+        TagAwareCacheInterface $cacheAdapter = null,
+        $defaultLifetime = 0
     ) {
         $this->setClient($client);
         $this->setBaseUrl($configApiBaseUrl);
@@ -41,11 +43,13 @@ class Client extends ApiClient
         if ($cacheAdapter) {
             $this->setCacheAdapter($cacheAdapter);
         };
+        $this->setDefaultLifetime($defaultLifetime);
 
         $this->getAuthorisationHeader($request);
     }
 
-    public function getLabelWithToken($label, $token) {
+    public function getLabelWithToken($label, $token): Result 
+    {
         // Generate cache key
         $key  = self::getCacheKey(self::LABEL, $label);
 
@@ -64,11 +68,15 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_LABELS . '/' . $label;
 
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
             // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
+
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
+
+        return $data;
     }
 
     public function getLabel($label)
@@ -76,15 +84,16 @@ class Client extends ApiClient
         return $this->getLabelWithToken($label, $this->getToken());
     }
 
-    public function getLabelsWithToken($filter, $token) {
+    public function getLabelsWithToken($filter, $token): Result 
+    {
         // Generate cache key
-        $key  = self::getCacheKey(self::LABELS);
+        $key  = self::getCacheKey(self::LABELS . $filter);
 
         // Check cache for data
         $data   = $this->getCacheItem($key);
 
         $tags   = [$key];
-    
+
         if (!$data) {
     
             $options = [];
@@ -95,11 +104,15 @@ class Client extends ApiClient
             // Create request URL
             $requestUrl = $this->getBaseUrl() . self::PATH_GET_LABELS . '/' . $filter;
 
-            $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
-    
             // Send request
-            return $this->handleRequest('GET', $requestUrl, $options);
+            $data = $this->handleRequest('GET', $requestUrl, $options);
+
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
         }
+
+        return $data;
     }
 
     public function getLabels($label)

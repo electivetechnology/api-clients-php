@@ -86,6 +86,9 @@ class Client extends ApiClient
 
     public function getLabelsWithToken($filter, $token): Result 
     {
+        $organisation = $this->getTokenDecoder()->getAttribute('organisation');
+
+        dump($organisation);
         // Generate cache key
         $key  = self::getCacheKey(self::LABELS . $filter);
 

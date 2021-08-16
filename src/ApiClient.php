@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Elective\ApiClients;
 
 use Elective\ApiClients\Result;
+use Elective\SecurityBundle\Token\TokenDecoderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -45,10 +46,14 @@ class ApiClient
     public const ACTION_MASTER      = 'master';
     public const ACTION_OWNER       = 'owner';
 
-    public function __construct(HttpClientInterface $client, bool $isEnabled = true)
-    {
-        $this->client = $client;
-        $this->isEnabled = $isEnabled;
+    public function __construct(
+        HttpClientInterface $client,
+        bool $isEnabled = true,
+        TokenDecoderInterface $tokenDecoder
+    ) {
+        $this->client       = $client;
+        $this->isEnabled    = $isEnabled;
+        $this->tokenDecoder = $tokenDecoder;
     }
 
     public function getClient(): ?HttpClientInterface
@@ -85,6 +90,11 @@ class ApiClient
         $this->token = $token;
 
         return $this;
+    }
+
+    public function getTokenDecoder(): TokenDecoderInterface
+    {
+        return $this->tokenDecoder;
     }
 
     public function getBaseUrl()

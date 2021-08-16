@@ -24,6 +24,23 @@ class Result
      */
     private $errorMessage;
 
+    /**
+     * Response Headers
+     */
+    private $headers = [];
+
+    /**
+     * Original message from Response
+     */
+    private $info;
+
+
+    /**
+     * Client error message
+     */
+    private $message;
+
+
     public function getCode(): ?int
     {
         return $this->code;
@@ -48,6 +65,46 @@ class Result
         return $this;
     }
 
+    public function getHeaders(): ?array
+    {
+        return $this->headers;
+    }
+
+    public function setHeaders(?array $headers): self
+    {
+        $this->headers = $headers;
+
+        return $this;
+    }
+
+    public function getHeader($key)
+    {
+        if (isset($this->headers[$key])) {
+            return $this->headers[$key];
+        }
+
+        return null;
+    }
+
+    public function setHeader($key, $value)
+    {
+        $this->headers[$key] = $value;
+
+        return $this;
+    }
+
+    public function getInfo(): ?string
+    {
+        return $this->info;
+    }
+
+    public function setInfo($info): self
+    {
+        $this->info = $info;
+
+        return $this;
+    }
+
     public function getErrorMessage(): ?string
     {
         return $this->errorMessage;
@@ -60,13 +117,16 @@ class Result
         return $this;
     }
 
-    /**
-     * @depricated
-     * This method will be removed
-     */
     public function getMessage(): ?string
     {
-        return $this->getErrorMessage();
+        return $this->message;
+    }
+
+    public function setMessage($message): self
+    {
+        $this->message = $message;
+
+        return $this;
     }
 
     /**

@@ -132,6 +132,21 @@ class ApiClient
             }
         }
 
+        // Set  total results of data
+        if ($response->getHeaders()) {
+            $headers = $response->getHeaders();
+
+            $result->setHeader('X-Results-Total', $headers['x-results-total'][0]);
+        }
+
+        // Set info
+        if (isset($result->getData()->message)) {
+            $result->setInfo($result->getData()->message);
+        }
+
+        // Set message type from status code
+        $result->setMessage($this->messageFromStatusCode($result->getCode()));
+    
         return $result;
     }
 

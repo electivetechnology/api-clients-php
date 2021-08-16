@@ -83,7 +83,7 @@ class Client extends ApiClient
         return $data;
     }
 
-    public function getChannels($query)
+    public function getChannels($query = null)
     {
         return $this->getChannelsWithToken($query, $this->getToken());
     }

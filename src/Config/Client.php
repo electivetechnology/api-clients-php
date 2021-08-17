@@ -4,6 +4,7 @@ namespace Elective\ApiClients\Config;
 
 use Elective\ApiClients\Result;
 use Elective\ApiClients\ApiClient;
+use Elective\CacheBundle\Utils\CacheTag;
 use Elective\FormatterBundle\Traits\{
     Cacheable,
     Outputable,
@@ -24,6 +25,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class Client extends ApiClient
 {
     use Cacheable;
+    use CacheTag;
 
     public const CONFIG_API_URL          = 'https://config-api.connect.staging.et-ns.net';
     public const PATH_GET_CHANNELS       = '/v1/channels';
@@ -65,7 +67,8 @@ class Client extends ApiClient
         // Check cache for data
         $data = $this->getCacheItem($key);
 
-        $tags = [$key];
+        // Create tags for cache
+        $tags = CacheTag::getCacheTags($organisationId, self::CHANNELS);
 
         if (!$data) {
 
@@ -103,7 +106,8 @@ class Client extends ApiClient
         // Check cache for data
         $data = $this->getCacheItem($key);
 
-        $tags = [$key];
+        // Create tags for cache
+        $tags = CacheTag::getCacheTags($organisationId, self::CHANNEL, $channel);
 
         if (!$data) {
             // Check if there are params
@@ -143,7 +147,8 @@ class Client extends ApiClient
         // Check cache for data
         $data = $this->getCacheItem($key);
 
-        $tags = [$key];
+        // Create tags for cache
+        $tags = CacheTag::getCacheTags($organisationId, self::CHANNEL_TYPE);
 
         if (!$data) {
     
@@ -181,7 +186,8 @@ class Client extends ApiClient
         // Check cache for data
         $data = $this->getCacheItem($key);
 
-        $tags = [$key];
+        // Create tags for cache
+        $tags = CacheTag::getCacheTags($organisationId, self::CV_COMPLEXITY);
 
         if (!$data) {
     

@@ -5,6 +5,7 @@ namespace Elective\ApiClients\Acl;
 use Elective\ApiClients\Result;
 use Elective\ApiClients\ApiClient;
 use Elective\ApiClients\Acl\Authorisation\Check;
+use Elective\CacheBundle\Utils\CacheTag;
 use Elective\FormatterBundle\Traits\{
     Cacheable,
     Outputable,
@@ -24,6 +25,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class Client extends ApiClient
 {
     use Cacheable;
+    use CacheTag;
 
     public const ACL_API_URL            = 'https://acl-api.connect.staging.et-ns.net';
     public const PATH_AUTHORISE         = '/v1/authorise';
@@ -82,7 +84,8 @@ class Client extends ApiClient
         // Check cache for data
         $data = $this->getCacheItem($key);
 
-        $tags = [$key];
+        // Create tags for cache
+        $tags = CacheTag::getCacheTags($organisation, self::ORGANISATION, $organisation);
 
         if (!$data) {
 

@@ -4,6 +4,7 @@ namespace Elective\ApiClients\Labels;
 
 use Elective\ApiClients\Result;
 use Elective\ApiClients\ApiClient;
+use Elective\CacheBundle\Utils\CacheTag;
 use Elective\FormatterBundle\Traits\{
     Cacheable,
     Outputable,
@@ -24,6 +25,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 class Client extends ApiClient
 {
     use Cacheable;
+    use CacheTag;
 
     public const LABELS_API_URL       = 'https://labels-api.connect.staging.et-ns.net';
     public const PATH_GET_LABELS      = '/v1/labels';
@@ -61,7 +63,8 @@ class Client extends ApiClient
         // Check cache for data
         $data   = $this->getCacheItem($key);
 
-        $tags   = [$key];
+        // Create tags for cache
+        $tags = CacheTag::getCacheTags($organisationId, self::LABEL, $label);
 
         if (!$data) {
     
@@ -99,7 +102,8 @@ class Client extends ApiClient
         // Check cache for data
         $data   = $this->getCacheItem($key);
 
-        $tags   = [$key];
+        // Create tags for cache
+        $tags = CacheTag::getCacheTags($organisationId, self::LABELS);
 
         if (!$data) {
     

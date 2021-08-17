@@ -25,7 +25,6 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 class Client extends ApiClient
 {
     use Cacheable;
-    use CacheTag;
 
     public const CANDIDATE_API_URL       = 'https://candidates-api.connect.staging.et-ns.net';
     public const PATH_GET_CANDIDATE      = '/v1/candidates';

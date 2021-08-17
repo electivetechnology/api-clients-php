@@ -25,7 +25,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class Client extends ApiClient
 {
     use Cacheable;
-    use CacheTag;
 
     public const CONFIG_API_URL          = 'https://config-api.connect.staging.et-ns.net';
     public const PATH_GET_CHANNELS       = '/v1/channels';

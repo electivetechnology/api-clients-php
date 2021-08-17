@@ -25,7 +25,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class Client extends ApiClient
 {
     use Cacheable;
-    use CacheTag;
 
     public const ACL_API_URL            = 'https://acl-api.connect.staging.et-ns.net';
     public const PATH_AUTHORISE         = '/v1/authorise';

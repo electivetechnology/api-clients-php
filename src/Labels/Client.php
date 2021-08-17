@@ -25,7 +25,6 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 class Client extends ApiClient
 {
     use Cacheable;
-    use CacheTag;
 
     public const LABELS_API_URL       = 'https://labels-api.connect.staging.et-ns.net';
     public const PATH_GET_LABELS      = '/v1/labels';

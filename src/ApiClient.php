@@ -146,7 +146,9 @@ class ApiClient
         if ($response->getHeaders()) {
             $headers = $response->getHeaders();
 
-            $result->setHeader('X-Results-Total', $headers['x-results-total'][0]);
+            if (isset($headers['x-results-total'])) {
+                $result->setHeader('X-Results-Total', $headers['x-results-total'][0]);
+            }
         }
 
         // Set info
@@ -172,8 +174,8 @@ class ApiClient
         }
     }
 
-    public static function getCacheKey(string $type, $id = null): string {
-        return $type . $id;
+    public static function getCacheKey(string $type, $organisation, $id = null): string {
+        return $type . $organisation . $id;
     }
 
     public function messageFromStatusCode($statusCode)

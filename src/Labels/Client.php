@@ -11,6 +11,7 @@ use Elective\FormatterBundle\Traits\{
     Sortable,
     Loggable
 };
+use Elective\SecurityBundle\Token\TokenDecoderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -34,12 +35,14 @@ class Client extends ApiClient
         string $configApiBaseUrl = self::LABELS_API_URL,
         bool $isEnabled = true,
         RequestStack $request,
+        TokenDecoderInterface $tokenDecoder,
         TagAwareCacheInterface $cacheAdapter = null,
         $defaultLifetime = 0
     ) {
         $this->setClient($client);
         $this->setBaseUrl($configApiBaseUrl);
         $this->setIsEnabled($isEnabled);
+        $this->tokenDecoder = $tokenDecoder;
         if ($cacheAdapter) {
             $this->setCacheAdapter($cacheAdapter);
         };
@@ -50,8 +53,10 @@ class Client extends ApiClient
 
     public function getLabelWithToken($label, $token): Result 
     {
+        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+
         // Generate cache key
-        $key  = self::getCacheKey(self::LABEL, $label);
+        $key  = self::getCacheKey(self::LABEL, $organisationId, $label);
 
         // Check cache for data
         $data   = $this->getCacheItem($key);
@@ -86,11 +91,10 @@ class Client extends ApiClient
 
     public function getLabelsWithToken($filter, $token): Result 
     {
-        // TODO
-        $organisation = $this->getTokenDecoder()->getAttribute('organisation');
+        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
 
         // Generate cache key
-        $key  = self::getCacheKey(self::LABELS . $filter);
+        $key  = self::getCacheKey(self::LABELS, $organisationId, $filter);
 
         // Check cache for data
         $data   = $this->getCacheItem($key);

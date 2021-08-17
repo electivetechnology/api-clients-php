@@ -11,6 +11,7 @@ use Elective\FormatterBundle\Traits\{
     Sortable,
     Loggable
 };
+use Elective\SecurityBundle\Token\TokenDecoderInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -38,12 +39,14 @@ class Client extends ApiClient
         string $configApiBaseUrl = self::CONFIG_API_URL,
         bool $isEnabled = true,
         RequestStack $request,
+        TokenDecoderInterface $tokenDecoder,
         TagAwareCacheInterface $cacheAdapter = null,
         $defaultLifetime = 0
     ) {
         $this->setClient($client);
         $this->setBaseUrl($configApiBaseUrl);
         $this->setIsEnabled($isEnabled);
+        $this->tokenDecoder = $tokenDecoder;
         if ($cacheAdapter) {
             $this->setCacheAdapter($cacheAdapter);
         };
@@ -54,8 +57,10 @@ class Client extends ApiClient
 
     public function getChannelsWithToken($query, $token): Result
     {
+        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+
         // Generate cache key
-        $key = self::getCacheKey(self::CHANNELS, $query);
+        $key = self::getCacheKey(self::CHANNELS, $organisationId, $query);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -90,8 +95,10 @@ class Client extends ApiClient
 
     public function getChannelWithToken($channel, $token, $detailed = null): Result
     {
+        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+    
         // Generate cache key
-        $key = self::getCacheKey(self::CHANNEL, $channel);
+        $key = self::getCacheKey(self::CHANNEL, $organisationId, $channel);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -128,8 +135,10 @@ class Client extends ApiClient
 
     public function getChannelTypeWithToken($token): Result
     {
+        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+
         // Generate cache key
-        $key = self::getCacheKey(self::CHANNEL_TYPE);
+        $key = self::getCacheKey(self::CHANNEL_TYPE, $organisationId);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -164,8 +173,10 @@ class Client extends ApiClient
 
     public function getCvComplexityWithToken($token): Result 
     {
+        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+
         // Generate cache key
-        $key = self::getCacheKey(self::CV_COMPLEXITY);
+        $key = self::getCacheKey(self::CV_COMPLEXITY, $organisationId);
 
         // Check cache for data
         $data = $this->getCacheItem($key);

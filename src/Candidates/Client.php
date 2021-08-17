@@ -11,6 +11,7 @@ use Elective\FormatterBundle\Traits\{
     Sortable,
     Loggable
 };
+use Elective\SecurityBundle\Token\TokenDecoderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -35,12 +36,14 @@ class Client extends ApiClient
         string $candidatesApiBaseUrl = self::CANDIDATE_API_URL,
         bool $isEnabled = true,
         RequestStack $request,
+        TokenDecoderInterface $tokenDecoder,
         TagAwareCacheInterface $cacheAdapter = null,
         $defaultLifetime = 0
     ) {
         $this->setClient($client);
         $this->setBaseUrl($candidatesApiBaseUrl);
         $this->setIsEnabled($isEnabled);
+        $this->tokenDecoder = $tokenDecoder;
         if ($cacheAdapter) {
             $this->setCacheAdapter($cacheAdapter);
         };
@@ -51,8 +54,10 @@ class Client extends ApiClient
 
     public function getCandidateWithToken($candidate, $token, $detailed = null): Result
     {
+        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+
         // Generate cache key
-        $key = self::getCacheKey(self::CANDIDATE, $candidate);
+        $key = self::getCacheKey(self::CANDIDATE, $organisationId, $candidate);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -89,8 +94,10 @@ class Client extends ApiClient
 
     public function getCandidatesWithToken($filter, $token): Result
     {
+        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+    
         // Generate cache key
-        $key = self::getCacheKey(self::CANDIDATES, $filter);
+        $key = self::getCacheKey(self::CANDIDATES, $organisationId, $filter);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
@@ -125,8 +132,10 @@ class Client extends ApiClient
 
     public function getNumberOfRecordsWithToken($token): Result
     {
+        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+
         // Generate cache key
-        $key = self::getCacheKey(self::NUMBER_OF_RECORDS);
+        $key = self::getCacheKey(self::NUMBER_OF_RECORDS, $organisationId);
 
         // Check cache for data
         $data = $this->getCacheItem($key);

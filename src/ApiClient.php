@@ -143,12 +143,13 @@ class ApiClient
         }
 
         // Set  total results of data
-        if ($response->getHeaders()) {
+        try {
             $headers = $response->getHeaders();
-
             if (isset($headers['x-results-total'])) {
                 $result->setHeader('X-Results-Total', $headers['x-results-total'][0]);
             }
+        } catch (\Throwable $th) {
+            // We got an error here, let the client deal with it
         }
 
         // Set info

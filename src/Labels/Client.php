@@ -4,6 +4,7 @@ namespace Elective\ApiClients\Labels;
 
 use Elective\ApiClients\Result;
 use Elective\ApiClients\ApiClient;
+use Elective\CacheBundle\Utils\CacheTag;
 use Elective\FormatterBundle\Traits\{
     Cacheable,
     Outputable,
@@ -11,6 +12,7 @@ use Elective\FormatterBundle\Traits\{
     Sortable,
     Loggable
 };
+use Elective\SecurityBundle\Token\TokenDecoderInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -23,6 +25,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 class Client extends ApiClient
 {
     use Cacheable;
+    use CacheTag;
 
     public const LABELS_API_URL       = 'https://labels-api.connect.staging.et-ns.net';
     public const PATH_GET_LABELS      = '/v1/labels';
@@ -34,12 +37,14 @@ class Client extends ApiClient
         string $configApiBaseUrl = self::LABELS_API_URL,
         bool $isEnabled = true,
         RequestStack $request,
+        TokenDecoderInterface $tokenDecoder,
         TagAwareCacheInterface $cacheAdapter = null,
         $defaultLifetime = 0
     ) {
         $this->setClient($client);
         $this->setBaseUrl($configApiBaseUrl);
         $this->setIsEnabled($isEnabled);
+        $this->tokenDecoder = $tokenDecoder;
         if ($cacheAdapter) {
             $this->setCacheAdapter($cacheAdapter);
         };
@@ -50,13 +55,16 @@ class Client extends ApiClient
 
     public function getLabelWithToken($label, $token): Result 
     {
+        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+
         // Generate cache key
-        $key  = self::getCacheKey(self::LABEL, $label);
+        $key  = self::getCacheKey(self::LABEL, $organisationId, $label);
 
         // Check cache for data
         $data   = $this->getCacheItem($key);
 
-        $tags   = [$key];
+        // Create tags for cache
+        $tags = CacheTag::getCacheTags($organisationId, self::LABEL, $label);
 
         if (!$data) {
     
@@ -86,13 +94,16 @@ class Client extends ApiClient
 
     public function getLabelsWithToken($filter, $token): Result 
     {
+        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+
         // Generate cache key
-        $key  = self::getCacheKey(self::LABELS . $filter);
+        $key  = self::getCacheKey(self::LABELS, $organisationId, $filter);
 
         // Check cache for data
         $data   = $this->getCacheItem($key);
 
-        $tags   = [$key];
+        // Create tags for cache
+        $tags = CacheTag::getCacheTags($organisationId, self::LABELS);
 
         if (!$data) {
     

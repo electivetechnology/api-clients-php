@@ -26,13 +26,13 @@ class Client extends ApiClient
 {
     use Cacheable;
 
-    public const ACL_API_URL            = 'https://acl-api.connect.staging.et-ns.net';
-    public const PATH_AUTHORISE         = '/v1/authorise';
-    public const PATH_GET_ORGANISATION  = '/v1/organisations';
-    public const PATH_TOKEN_EXCHANGE    = '/v1/token/exchange';
-    public const PATH_GET_USERS         = '/v1/users';
-    public const PATH_ROLE              = '/v1/roles';
-    public const ORGANISATION           = 'organisation';
+    public const ACL_API_URL                = 'https://acl-api.connect.staging.et-ns.net';
+    public const PATH_AUTHORISE             = '/v1/authorise';
+    public const PATH_GET_ORGANISATION      = '/v1/organisations';
+    public const PATH_TOKEN_EXCHANGE        = '/v1/token/exchange';
+    public const PATH_GET_USERS             = '/v1/users';
+    public const PATH_ROLE                  = '/v1/roles';
+    public const MODEL_NAME_ORGANISATION    = 'organisation';
 
     public function __construct(
         HttpClientInterface $client,
@@ -78,13 +78,13 @@ class Client extends ApiClient
     public function getOrganisationWithToken($organisation, $token, $detailed = null): Result
     {
         // Generate cache key
-        $key = self::getCacheKey(self::ORGANISATION, $organisation);
+        $key = self::getCacheKey(self::MODEL_NAME_ORGANISATION, $organisation);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisation, self::ORGANISATION, $organisation);
+        $tags = CacheTag::getCacheTags($organisation, self::MODEL_NAME_ORGANISATION, $organisation);
 
         if (!$data) {
 

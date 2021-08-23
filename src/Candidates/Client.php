@@ -26,11 +26,10 @@ class Client extends ApiClient
 {
     use Cacheable;
 
-    public const CANDIDATE_API_URL       = 'https://candidates-api.connect.staging.et-ns.net';
-    public const PATH_GET_CANDIDATE      = '/v1/candidates';
-    public const CANDIDATE               = 'candidate';
-    public const CANDIDATES              = 'candidates';
-    public const NUMBER_OF_RECORDS       = 'numberOfRecords';
+    public const CANDIDATE_API_URL              = 'https://candidates-api.connect.staging.et-ns.net';
+    public const PATH_GET_CANDIDATE             = '/v1/candidates';
+    public const MODEL_NAME_CANDIDATE           = 'candidate';
+    public const MODEL_NAME_NUMBER_OF_RECORDS   = 'numberOfRecords';
 
     public function __construct(
         HttpClientInterface $client,
@@ -58,13 +57,13 @@ class Client extends ApiClient
         $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
 
         // Generate cache key
-        $key = self::getCacheKey(self::CANDIDATE, $organisationId, $candidate);
+        $key = self::getCacheKey(self::MODEL_NAME_CANDIDATE, $organisationId, $candidate);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisationId, self::CANDIDATE, $candidate);
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_CANDIDATE, $candidate);
 
         if (!$data) {
             // Check if there are params
@@ -99,13 +98,13 @@ class Client extends ApiClient
         $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
     
         // Generate cache key
-        $key = self::getCacheKey(self::CANDIDATES, $organisationId, $filter);
+        $key = self::getCacheKey(self::MODEL_NAME_CANDIDATE, $organisationId, $filter);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisationId, self::CANDIDATES);
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_CANDIDATE);
 
         if (!$data) {
 
@@ -138,13 +137,13 @@ class Client extends ApiClient
         $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
 
         // Generate cache key
-        $key = self::getCacheKey(self::NUMBER_OF_RECORDS, $organisationId);
+        $key = self::getCacheKey(self::MODEL_NAME_NUMBER_OF_RECORDS, $organisationId);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisationId, self::NUMBER_OF_RECORDS);
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_NUMBER_OF_RECORDS);
 
         if (!$data) {
     

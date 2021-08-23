@@ -53,7 +53,7 @@ class Client extends ApiClient
 
     public function getLabelWithToken($label, $token): Result 
     {
-        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+        $organisationId = $this->getOrganisationFromToken($token);
 
         // Generate cache key
         $key  = self::getCacheKey(self::MODEL_NAME_LABEL, $organisationId, $label);
@@ -92,7 +92,7 @@ class Client extends ApiClient
 
     public function getLabelsWithToken($filter, $token): Result 
     {
-        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+        $organisationId = $this->getOrganisationFromToken($token);
 
         // Generate cache key
         $key  = self::getCacheKey(self::MODEL_NAME_LABEL, $organisationId, $filter);

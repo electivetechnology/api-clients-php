@@ -54,7 +54,7 @@ class Client extends ApiClient
 
     public function getCandidateWithToken($candidate, $token, $detailed = null): Result
     {
-        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+        $organisationId = $this->getOrganisationFromToken($token);
 
         // Generate cache key
         $key = self::getCacheKey(self::MODEL_NAME_CANDIDATE, $organisationId, $candidate);
@@ -95,7 +95,7 @@ class Client extends ApiClient
 
     public function getCandidatesWithToken($filter, $token): Result
     {
-        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+        $organisationId = $this->getOrganisationFromToken($token);
     
         // Generate cache key
         $key = self::getCacheKey(self::MODEL_NAME_CANDIDATE, $organisationId, $filter);
@@ -134,7 +134,7 @@ class Client extends ApiClient
 
     public function getNumberOfRecordsWithToken($token): Result
     {
-        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+        $organisationId = $this->getOrganisationFromToken($token);
 
         // Generate cache key
         $key = self::getCacheKey(self::MODEL_NAME_NUMBER_OF_RECORDS, $organisationId);

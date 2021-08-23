@@ -57,7 +57,7 @@ class Client extends ApiClient
 
     public function getChannelsWithToken($query, $token): Result
     {
-        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+        $organisationId = $this->getOrganisationFromToken($token);
 
         // Generate cache key
         $key = self::getCacheKey(self::MODEL_NAME_CHANNEL, $organisationId, $query);
@@ -96,7 +96,7 @@ class Client extends ApiClient
 
     public function getChannelWithToken($channel, $token, $detailed = null): Result
     {
-        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+        $organisationId = $this->getOrganisationFromToken($token);
     
         // Generate cache key
         $key = self::getCacheKey(self::MODEL_NAME_CHANNEL, $organisationId, $channel);
@@ -137,7 +137,7 @@ class Client extends ApiClient
 
     public function getChannelTypeWithToken($token): Result
     {
-        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+        $organisationId = $this->getOrganisationFromToken($token);
 
         // Generate cache key
         $key = self::getCacheKey(self::MODEL_NAME_CHANNEL_TYPE, $organisationId);
@@ -176,7 +176,7 @@ class Client extends ApiClient
 
     public function getCvComplexityWithToken($token): Result 
     {
-        $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
+        $organisationId = $this->getOrganisationFromToken($token);
 
         // Generate cache key
         $key = self::getCacheKey(self::MODEL_NAME_CV_COMPLEXITY, $organisationId);

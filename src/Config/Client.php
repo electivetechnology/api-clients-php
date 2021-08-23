@@ -26,14 +26,13 @@ class Client extends ApiClient
 {
     use Cacheable;
 
-    public const CONFIG_API_URL          = 'https://config-api.connect.staging.et-ns.net';
-    public const PATH_GET_CHANNELS       = '/v1/channels';
-    public const PATH_GET_CHANNEL_TYPE   = '/v1/channel-types';
-    public const PATH_GET_CV_COMPLEXITY  = '/v1/candidates/cv-complexity';
-    public const CV_COMPLEXITY           = 'cvComplexity';
-    public const CHANNEL                 = 'channel';
-    public const CHANNELS                = 'channels';
-    public const CHANNEL_TYPE            = 'channelType';
+    public const CONFIG_API_URL             = 'https://config-api.connect.staging.et-ns.net';
+    public const PATH_GET_CHANNELS          = '/v1/channels';
+    public const PATH_GET_CHANNEL_TYPE      = '/v1/channel-types';
+    public const PATH_GET_CV_COMPLEXITY     = '/v1/candidates/cv-complexity';
+    public const MODEL_NAME_CV_COMPLEXITY   = 'cvComplexity';
+    public const MODEL_NAME_CHANNEL         = 'channel';
+    public const MODEL_NAME_CHANNEL_TYPE    = 'channelType';
 
     public function __construct(
         HttpClientInterface $client,
@@ -61,13 +60,13 @@ class Client extends ApiClient
         $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
 
         // Generate cache key
-        $key = self::getCacheKey(self::CHANNELS, $organisationId, $query);
+        $key = self::getCacheKey(self::MODEL_NAME_CHANNEL, $organisationId, $query);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisationId, self::CHANNELS);
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_CHANNEL);
 
         if (!$data) {
 
@@ -100,13 +99,13 @@ class Client extends ApiClient
         $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
     
         // Generate cache key
-        $key = self::getCacheKey(self::CHANNEL, $organisationId, $channel);
+        $key = self::getCacheKey(self::MODEL_NAME_CHANNEL, $organisationId, $channel);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisationId, self::CHANNEL, $channel);
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_CHANNEL, $channel);
 
         if (!$data) {
             // Check if there are params
@@ -141,13 +140,13 @@ class Client extends ApiClient
         $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
 
         // Generate cache key
-        $key = self::getCacheKey(self::CHANNEL_TYPE, $organisationId);
+        $key = self::getCacheKey(self::MODEL_NAME_CHANNEL_TYPE, $organisationId);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisationId, self::CHANNEL_TYPE);
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_CHANNEL_TYPE);
 
         if (!$data) {
     
@@ -180,13 +179,13 @@ class Client extends ApiClient
         $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
 
         // Generate cache key
-        $key = self::getCacheKey(self::CV_COMPLEXITY, $organisationId);
+        $key = self::getCacheKey(self::MODEL_NAME_CV_COMPLEXITY, $organisationId);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisationId, self::CV_COMPLEXITY);
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_CV_COMPLEXITY);
 
         if (!$data) {
     

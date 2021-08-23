@@ -28,8 +28,7 @@ class Client extends ApiClient
 
     public const LABELS_API_URL       = 'https://labels-api.connect.staging.et-ns.net';
     public const PATH_GET_LABELS      = '/v1/labels';
-    public const LABELS               = 'labels';
-    public const LABEL                = 'label';
+    public const MODEL_NAME_LABEL     = 'label';
 
     public function __construct(
         HttpClientInterface $client,
@@ -57,13 +56,13 @@ class Client extends ApiClient
         $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
 
         // Generate cache key
-        $key  = self::getCacheKey(self::LABEL, $organisationId, $label);
+        $key  = self::getCacheKey(self::MODEL_NAME_LABEL, $organisationId, $label);
 
         // Check cache for data
         $data   = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisationId, self::LABEL, $label);
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_LABEL, $label);
 
         if (!$data) {
     
@@ -96,13 +95,13 @@ class Client extends ApiClient
         $organisationId = $this->getTokenDecoder()->getAttribute('organisation')->getValue();
 
         // Generate cache key
-        $key  = self::getCacheKey(self::LABELS, $organisationId, $filter);
+        $key  = self::getCacheKey(self::MODEL_NAME_LABEL, $organisationId, $filter);
 
         // Check cache for data
         $data   = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisationId, self::LABELS);
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_LABEL);
 
         if (!$data) {
     

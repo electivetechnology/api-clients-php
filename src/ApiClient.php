@@ -163,7 +163,7 @@ class ApiClient
         return $result;
     }
 
-    public function getOrganisationFromToken(string $token): string {
+    public function getOrganisationFromToken(?string $token): string {
         try {
             $attributes     = $this->getTokenDecoder()->decodeJWTUserToken($token);
             $organisationId = isset($attributes['organisation']) ? $attributes['organisation'] : '';

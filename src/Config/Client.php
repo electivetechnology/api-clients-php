@@ -76,7 +76,7 @@ class Client extends ApiClient
             $options['auth_bearer'] = $token;
     
             // Create request URL
-            $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '/' . $query;
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_CHANNELS . '?' . $query;
     
             // Send request
             $data = $this->handleRequest('GET', $requestUrl, $options);

@@ -170,7 +170,7 @@ class Client extends ApiClient
         return $this->getNumberOfRecordsWithToken($this->getToken());
     }
 
-    public function getCandidatesByVendorWithToken($vendor, $vendorId, $token): Result
+    public function getCandidateByVendorWithToken($vendor, $vendorId, $token): Result
     {
         $organisationId = $this->getOrganisationFromToken($token);
     
@@ -204,7 +204,7 @@ class Client extends ApiClient
         return $data;
     }
 
-    public function getCandidatesByVendor($vendor, $vendorId)
+    public function getCandidateByVendor($vendor, $vendorId)
     {
         return $this->getCandidatesWithToken($vendor, $vendorId, $this->getToken());
     }

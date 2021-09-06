@@ -206,6 +206,6 @@ class Client extends ApiClient
 
     public function getCandidateByVendor($vendor, $vendorId)
     {
-        return $this->getCandidatesWithToken($vendor, $vendorId, $this->getToken());
+        return $this->getCandidateWithToken($vendor, $vendorId, $this->getToken());
     }
 }

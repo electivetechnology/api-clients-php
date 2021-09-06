@@ -169,4 +169,43 @@ class Client extends ApiClient
     {
         return $this->getNumberOfRecordsWithToken($this->getToken());
     }
+
+    public function getCandidateByVendorWithToken($vendor, $vendorId, $token): Result
+    {
+        $organisationId = $this->getOrganisationFromToken($token);
+    
+        // Generate cache key
+        $key = self::getCacheKey(self::MODEL_NAME_CANDIDATE, $organisationId, $vendor, $vendorId);
+
+        // Check cache for data
+        $data = $this->getCacheItem($key);
+
+        // Create tags for cache
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_CANDIDATE);
+
+        if (!$data) {
+
+            $options = [];
+    
+            // Set token for this request
+            $options['auth_bearer'] = $token;
+    
+            // Create request URL
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_CANDIDATE . '/vendor/' . $vendor . '/' . $vendorId;
+
+            // Send request
+            $data = $this->handleRequest('GET', $requestUrl, $options);
+
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
+        }
+
+        return $data;
+    }
+
+    public function getCandidateByVendor($vendor, $vendorId)
+    {
+        return $this->getCandidatesWithToken($vendor, $vendorId, $this->getToken());
+    }
 }

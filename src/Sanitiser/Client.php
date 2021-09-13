@@ -46,11 +46,12 @@ class Client extends ApiClient
         return $this->handleRequest('POST', $requestUrl, $options);
     }
 
-    public function getPhone($id, $phone): Result
+    public function getPhone($id, $phone, $countryCode): Result
     {
         $payload = new \StdClass();
         $payload->uuid = $id;
         $payload->input = $phone;
+        $payload->countryCode = $countryCode;
 
         // Prepare client options
         $options = [];

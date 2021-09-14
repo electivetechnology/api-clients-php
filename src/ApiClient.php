@@ -127,7 +127,7 @@ class ApiClient
 
         // Set Data
         // Try auto parsing JSON
-        if($response->getInfo('content_type') == 'application/json') {
+        if(str_contains($response->getInfo('content_type'), 'application/json')) {
             $result->setData(json_decode($response->getContent(false)));
         } else {
             $result->setData($response->getContent(false));

@@ -22,7 +22,7 @@ class Client extends ApiClient
     use Cacheable;
 
     public const MESSAGES_API_URL               = 'https://messages-api.connect.staging.et-ns.net';
-    public const PATH_GET_MESSAGES_TEMPLATE     = '/v1/message-templates';
+    public const PATH_GET_MESSAGES_TEMPLATE     = '/v2/message-templates';
     public const MODEL_NAME_MESSAGE_TEMPLATE    = 'messageTemplate';
 
     public function __construct(

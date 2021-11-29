@@ -68,4 +68,24 @@ class Client extends ApiClient
         // Send request
         return $this->handleRequest('POST', $requestUrl, $options);
     }
+
+    /**
+     * Create new Authorization
+     *
+     * @return Result
+     */
+    public function reAuthorization($componentId): ?Result
+    {
+        // Prepare client options
+        $options = [];
+
+        // Set Token for this request
+        $options['auth_bearer'] = $this->getToken();
+
+        // Create request URL
+        $requestUrl = $this->getBaseUrl() . self::PATH_AUTHORIZATIONS . '/' . $componentId . '/token';
+
+        // Send request
+        return $this->handleRequest('GET', $requestUrl, $options);
+    }
 }

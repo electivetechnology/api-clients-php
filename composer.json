@@ -12,8 +12,8 @@
     ],
     "require": {
         "php": "^7.1.13",
-        "electivegroup/cache-bundle": "^0",
-        "electivegroup/formatter-bundle": "^0",
+        "electivegroup/cache-bundle": "dev-orm-sym5",
+        "electivegroup/formatter-bundle": "dev-orm-sym5",
         "electivetechnology/security-bundle": "^0",
         "symfony/http-client": "^4.4|^5",
         "symfony/http-foundation": "^4.4|^5"

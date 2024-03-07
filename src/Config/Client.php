@@ -219,17 +219,17 @@ class Client extends ApiClient
     public function getByOrganisationContent($organisationId, $contentName)
     {
         // Generate cache key
-        $key = self::getCacheKey(self::MODEL_NAME_CV_COMPLEXITY, $organisationId);
+        $key = self::getCacheKey(self::MODEL_NAME_ORGANISATION_CONTENT, $organisationId);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_CV_COMPLEXITY);
+        $tags = CacheTag::getCacheTags($organisationId, self::PATH_GET_ORGANISATION_CONTENT);
 
         if (!$data) {            
             // Create request URL
-            $requestUrl = $this->getBaseUrl() . self::PATH_GET_CV_COMPLEXITY . 
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION_CONTENT . 
                 '/organisation/' . $organisationId . '/content/' . $contentName;
             
             // Send request

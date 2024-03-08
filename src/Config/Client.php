@@ -225,7 +225,7 @@ class Client extends ApiClient
         $data = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisationId, self::PATH_GET_ORGANISATION_CONTENT);
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_ORGANISATION_CONTENT);
 
         if (!$data) {            
             // Create request URL

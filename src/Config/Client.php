@@ -26,13 +26,15 @@ class Client extends ApiClient
 {
     use Cacheable;
 
-    public const CONFIG_API_URL             = 'https://config-api.connect.staging.et-ns.net';
-    public const PATH_GET_CHANNELS          = '/v1/channels';
-    public const PATH_GET_CHANNEL_TYPE      = '/v1/channel-types';
-    public const PATH_GET_CV_COMPLEXITY     = '/v1/candidates/cv-complexity';
-    public const MODEL_NAME_CV_COMPLEXITY   = 'cvComplexity';
-    public const MODEL_NAME_CHANNEL         = 'channel';
-    public const MODEL_NAME_CHANNEL_TYPE    = 'channelType';
+    public const CONFIG_API_URL                     = 'https://config-api.connect.staging.et-ns.net';
+    public const PATH_GET_CHANNELS                  = '/v1/channels';
+    public const PATH_GET_CHANNEL_TYPE              = '/v1/channel-types';
+    public const PATH_GET_CV_COMPLEXITY             = '/v1/candidates/cv-complexity';
+    public const PATH_GET_ORGANISATION_CONTENT      = '/v1/organisation-contents';
+    public const MODEL_NAME_CV_COMPLEXITY           = 'cvComplexity';
+    public const MODEL_NAME_CHANNEL                 = 'channel';
+    public const MODEL_NAME_CHANNEL_TYPE            = 'channelType';
+    public const MODEL_NAME_ORGANISATION_CONTENT    = 'organisationContent';
 
     public function __construct(
         HttpClientInterface $client,
@@ -211,5 +213,33 @@ class Client extends ApiClient
     public function getCvComplexity()
     {
         return $this->getCvComplexityWithToken($this->getToken());
+    }
+
+
+    public function getByOrganisationContent($organisationId, $contentName)
+    {
+        // Generate cache key
+        $key = self::getCacheKey(self::MODEL_NAME_ORGANISATION_CONTENT, $organisationId);
+
+        // Check cache for data
+        $data = $this->getCacheItem($key);
+
+        // Create tags for cache
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_ORGANISATION_CONTENT);
+
+        if (!$data) {            
+            // Create request URL
+            $requestUrl = $this->getBaseUrl() . self::PATH_GET_ORGANISATION_CONTENT . 
+                '/organisation/' . $organisationId . '/content/' . $contentName;
+            
+            // Send request
+            $data = $this->handleRequest('GET', $requestUrl, []);
+
+            if ($data->isSuccessful()) {
+                $this->setCacheItem($key, $data, $this->getDefaultLifetime(), $tags);
+            }
+        }
+
+        return $data;
     }
 }

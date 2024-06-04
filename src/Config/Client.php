@@ -219,13 +219,13 @@ class Client extends ApiClient
     public function getByOrganisationContent($organisationId, $contentName)
     {
         // Generate cache key
-        $key = self::getCacheKey(self::MODEL_NAME_ORGANISATION_CONTENT, $organisationId);
+        $key = self::getCacheKey(self::MODEL_NAME_ORGANISATION_CONTENT, $organisationId, $contentName);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
 
         // Create tags for cache
-        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_ORGANISATION_CONTENT);
+        $tags = CacheTag::getCacheTags($organisationId, self::MODEL_NAME_ORGANISATION_CONTENT, $contentName);
 
         if (!$data) {            
             // Create request URL

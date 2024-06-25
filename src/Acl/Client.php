@@ -78,7 +78,7 @@ class Client extends ApiClient
     public function getOrganisationWithToken($organisation, $token, $detailed = null): Result
     {
         // Generate cache key
-        $key = self::getCacheKey(self::MODEL_NAME_ORGANISATION, $organisation);
+        $key = self::getCacheKey(self::MODEL_NAME_ORGANISATION, $organisation, (bool)$detailed);
 
         // Check cache for data
         $data = $this->getCacheItem($key);
